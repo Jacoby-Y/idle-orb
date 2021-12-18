@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script defer src="./lib/web_mono_lib.js"></script>
+    <script defer src="./lib/game_mono_lib.js"></script>
+
+    <script defer src="./src/data.js"></script>
+    <script defer src="./src/entities.js"></script>
+    <script defer src="./src/app.js"></script>
+
+    <link rel="stylesheet" href="./style.css">
+    <title>Idle Orbs</title>
+</head>
+<body>
+    <main>
+        <div #cash-mana>
+            <h3 #cash :w>Cash: {cash}</h3>
+            <h3 #mana :w>Mana: {mana}</h3>
+        </div>
+        <div #tabs>
+            <div .tab>Shop</div>
+            <div .tab>Idle</div>
+            <div .tab>Prestige</div>
+        </div>
+        <div #sections>
+            <div .section #upgr-orbs>
+                <div .btn></div>
+                <div .btn></div>
+                <div .btn></div>
+                <div .btn></div>
+                <div .btn></div>
+                <div .btn></div>
+            </div>
+            <div .section #upgr-idle>
+                <div .btn><h3 :w>+1/sec: ${idle_orb_cost}</h3><h3 :w>({idle_orb_sec}/sec)</h3></div>
+            </div>
+            <div .section #prestige>
+                <div .btn><h3 :w>{calc_mana, prest_cost => Mana +[0]: $[1] & start over}</h3>
+                    <h3 .tip>Gives a change to spawn another orb when one is collected</h3>
+                </div>
+                <div .btn|upgr><h3 :w>Recycle +1%: {prest_upgr_costs:0} mana</h3><h3 .info>?</h3>
+                    <h3 .tip>Gives a chance to spawn another orb when one is collected<br>
+                    Current: 0%</h3>
+                </div>
+                <div .btn|upgr><h3 :w>Shotgun +1%: {prest_upgr_costs:1} mana</h3><h3 .info>?</h3>
+                    <h3 .tip>Gives a chance to spawn multiple orbs at once<br>
+                    Current: 0%</h3>
+                </div>
+                <div .btn|upgr><h3 :w>Shotgun Amount +1: {prest_upgr_costs:2} mana</h3><h3 .info>?</h3>
+                    <h3 .tip>Increases the amount of orbs spawned with shotgun shot<br>
+                    Current: 2</h3>
+                </div>
+            </div>
+        </div>
+    </main>
+    <canvas #canvas></canvas>
+</body>
+</html>
