@@ -1,5 +1,6 @@
 D.settings = {
     cash: {display(v){ calc_mana(); return format_num(v, 1)}, round: 1},
+    mana: {display(v){ calc_mana(); return format_num(v, 1)}, round: 1},
     prest_cost: {display(v){ return format_num(v, 1)}, round: 1},
 };
 
@@ -12,7 +13,8 @@ const calc_mana = ()=>{
 D.mana = 0;
 D.calc_mana = 0; 
 D.prest_cost = 100000; // 100k
-D.prest_upgr_costs = [5, 5, 25];
+D.prest_upgr_costs = [5, 5, 25, 10];
+D.prest_upgr_values = [0, 0, 2, 0];
 
 D.$init = {};
 D.$do_init = true; // D.$load = true;

@@ -39,16 +39,20 @@
                     <h3 .tip>Gives a change to spawn another orb when one is collected</h3>
                 </div>
                 <div .btn|upgr><h3 :w>Recycle +1%: {prest_upgr_costs:0} mana</h3><h3 .info>?</h3>
-                    <h3 .tip>Gives a chance to spawn another orb when one is collected<br>
-                    Current: 0%</h3>
+                    <h3 .tip :w>Gives a chance to spawn another orb when one is collected<br>
+                    Current: {prest_upgr_values:0}%</h3>
                 </div>
                 <div .btn|upgr><h3 :w>Shotgun +1%: {prest_upgr_costs:1} mana</h3><h3 .info>?</h3>
-                    <h3 .tip>Gives a chance to spawn multiple orbs at once<br>
-                    Current: 0%</h3>
+                    <h3 .tip :w>Gives a chance to spawn multiple orbs at once<br>
+                    Current: {prest_upgr_values:1}%</h3>
                 </div>
                 <div .btn|upgr><h3 :w>Shotgun Amount +1: {prest_upgr_costs:2} mana</h3><h3 .info>?</h3>
-                    <h3 .tip>Increases the amount of orbs spawned with shotgun shot<br>
-                    Current: 2</h3>
+                    <h3 .tip :w>Increases the amount of orbs spawned with shotgun shot<br>
+                    Current: {prest_upgr_values:2}</h3>
+                </div>
+                <div .btn|upgr><h3 :w>Velocity +0.2%: {prest_upgr_costs:3} mana</h3><h3 .info>?</h3>
+                    <h3 .tip :w>Increases the starting velocity of the orbs<br>
+                    Current: {prest_upgr_values:3}%</h3>
                 </div>
             </div>
         </div>

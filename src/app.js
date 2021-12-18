@@ -100,11 +100,34 @@ prest_btns[0].onclick = ()=>{
             if (k == "prest_cost" || k == "mana" || k == "calc_mana") continue;
             const v = D.$init[k];
             D[k] = v;
-            console.log(k);
         }
     }
     total_weight = get_weight(D.orbs);
     update_orb_btns();
+}
+
+const upgr_prest_thing = (i=0, incr=1, mult=1.2)=>{
+    if (D.mana < D.prest_upgr_costs[i]) return;
+    D.mana -= D.prest_upgr_costs[i];
+    D.prest_upgr_costs[i] = Math.floor(D.prest_upgr_costs[i] * mult);
+    D.prest_upgr_values[i] += incr;
+    D.prest_upgr_values[i] = Math.round(D.prest_upgr_values[i]*10)/10;
+
+    D.prest_upgr_costs = D.prest_upgr_costs;
+    D.prest_upgr_values = D.prest_upgr_values;
+}
+
+prest_btns[1].onclick = ()=>{ // recycle
+    upgr_prest_thing(0, 1, 1.25);
+}
+prest_btns[2].onclick = ()=>{ // shotgun %
+    upgr_prest_thing(1, 1, 1.2);
+}
+prest_btns[3].onclick = ()=>{ // shotgun #
+    upgr_prest_thing(2, 1, 1.25);
+}
+prest_btns[4].onclick = ()=>{ // velocity
+    upgr_prest_thing(3, 0.2, 1.5);
 }
 //#endregion
 

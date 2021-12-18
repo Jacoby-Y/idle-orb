@@ -8,6 +8,8 @@ const main_func = ()=>{
     run_mouse_listeners();
 }
 
+const entity_cap = 200;
+
 const collect1 = { x: 75, y: canvas.height-75, G: 50000 };
 const collect2 = { x: canvas.width-75, y: 75, G: 40000 };
 const collect3 = { x: canvas.width-75, y: canvas.height-75, G: 30000 };
@@ -39,8 +41,16 @@ const rand_orb = (list=[new Orb()])=>{
             total += w;
             if (rand <= total) return list[i];
         }
-    }
+}
+const perc_chance = (perc=0)=>{
+    const over = Math.floor(perc/100);
+    const mod = perc%100;
+    const rand = Math.ceil(Math.random()*100);
+    return {over: over, rand: (rand <= mod)};
+}
 const emit_orb = function(e) {
+    if (entities.length > entity_cap) return;
+
     const orb = rand_orb(D.orbs);
 
     const part = new Entity()
@@ -66,6 +76,8 @@ const emit_orb = function(e) {
                     Math.cos(angle_bounce) * (velocity*2),
                     Math.sin(angle_bounce) * (velocity*2),
                 );
+                self.physics.vx *= 0.9;
+                self.physics.vy *= 0.9;
                 self.physics.step(true, false);
                 return;
             }
@@ -86,24 +98,32 @@ const emit_orb = function(e) {
                 self._destroy = true;
             }
 
-            if (self._destroy) return;
+            if (self._destroy) {
+                const res = perc_chance(D.prest_upgr_values[0]);
+                for (let i = 0; i < res.over; i++) emit_orb();
+                if (res.rand) emit_orb();
+                return;
+            }
 
             const sx = self.vector.x;
             const sy = self.vector.y;
             if (sx <= 0) {
-                self.physics.vx *= -1;
+                self.physics.vy *= (self.physics.vx > 50)? -0.3 : -0.9;
+                self.physics.vx *= -0.9;
                 self.vector.x = 1;
             }
             if (sy <= 0) {
-                self.physics.vy *= -1;
+                self.physics.vy *= (self.physics.vy > 50)? -0.3 : -0.9;
+                self.physics.vy *= -0.9;
                 self.vector.y = 1;
             }
             if (sx >= canvas.width) {
-                self.physics.vx *= -1;
+                self.physics.vy *= (self.physics.vx > 50)? -0.3 : -0.9;
+                self.physics.vx *= -0.9;
                 self.vector.x = canvas.width-1;
             }
             if (sy >= canvas.height) {
-                self.physics.vy *= -1;
+                self.physics.vy *= (self.physics.vy > 50)? -0.3 : -0.9;
                 self.vector.y = canvas.height-1;
             }
 
@@ -112,7 +132,14 @@ const emit_orb = function(e) {
     });
     const vx = Math.ceil(Math.random() * 20);
     const vy = Math.ceil(Math.random() * 15);
-    part.bind(new Physics(vx, vy, 0, 0.98, part.vector));
+
+
+    const angle = Math.floor(Math.random()*140)/100;
+    const vel = (Math.ceil(Math.random() * 5)+10*(1+D.prest_upgr_values[3]));
+    const ox = Math.cos(angle)*vel;
+    const oy = Math.sin(angle)*vel;
+
+    part.bind(new Physics(ox, oy, 0, 0.98, part.vector));
 
     // console.log(part);
 }; $("#canvas").onclick = (e)=> {
@@ -120,7 +147,18 @@ const emit_orb = function(e) {
     const now = Date.now();
     if (now-last_click < 150) return;
     last_click = now;
-    emit_orb(e);
+
+    const res = perc_chance(D.prest_upgr_values[1]);
+    if (res.over > 0) {
+        for (let i = 0; i < res.over; i++) 
+            for (let i = 0; i < D.prest_upgr_values[2]; i++) emit_orb(e);
+    }
+    if (res.rand) {
+        for (let i = 0; i < D.prest_upgr_values[2]; i++) emit_orb(e);
+    } else {
+        emit_orb(e);
+    }
+
 }
 
 const loop_emit = (amount)=>{
