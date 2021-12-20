@@ -1,34 +1,170 @@
+let run_main = true;
 const main_func = ()=>{
+    if (run_main == false && entities.length <= 0) return;
+    if (run_main == false && entities.length > 0) run_main = true;
+
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0,0, canvas.width, canvas.height);
 
     update_entities();
     run_update_functions();
-    event_manager.step_jobs();
-    run_mouse_listeners();
+    // event_manager.step_jobs();
+    // run_mouse_listeners();
+
+    if (run_main == true && entities.length <= 0) run_main = false;
 }
 
-const entity_cap = 200;
+class Orb_Ent {
+    constructor(index, drag=0.98, vect={x:1,y:1}, orb=new Orb(), cull=false) {
+        this.cull = cull;
+        if (!cull) total_drawn++;
+        this.index = index;
+        this.pos = {x:45,y:45};
+        this.vect = vect;
+        this.vect.add_force = function(x,y){
+            this.x += x;
+            this.y += y;
+        };
+        this.vect.step = ()=>{
+            for (let i = 0; i < steps; i++) {
+                this.vect.x *= drag;
+                this.vect.y *= drag;
+                
+                this.pos.x += this.vect.x;
+                this.pos.y += this.vect.y;
+            }
+        }
+        this.orb = orb;
+    }
+    update() {
+        // if (!this.cull) draw_circ2(this.pos, 10, this.orb.color, true);
+        if (!this.cull) draw.rect(this.pos.x-10, this.pos.y-10, 20, 20, { fill: true, fillStyle: this.orb.color });
+
+        const dist_rep = distance2(this.pos, repulse1);
+        if (dist_rep <= repulse1.size) { // Hit repulser
+            const velocity = distance(this.pos.x, this.pos.y, this.pos.x + this.vect.x, this.pos.y + this.vect.y);
+            const normal = get_angle(repulse1, this.pos) + Math.PI*2;
+            const vector = get_angle(this.pos, {x: this.pos.x + this.vect.x, y: this.pos.y + this.vect.y})+Math.PI;
+            // const tangent = normal+Math.PI/2;
+
+            let bounce = 0;
+            const diff = Math.max(normal, vector) - Math.min(normal, vector);
+            if (normal > vector) bounce = normal + diff;
+            else bounce = normal - diff;
+            
+            this.pos.x = repulse1.x + Math.cos(normal)*(repulse1.size+5);
+            this.pos.y = repulse1.y + Math.sin(normal)*(repulse1.size+5);
+
+            if (velocity <= 10) {
+                this.vect.add_force( Math.cos(normal)*15, Math.sin(normal)*15 )
+                this.vect.step(true, false); return;
+            } 
+            this.vect.x = 0; this.vect.y = 0;
+
+            this.vect.add_force(
+                Math.cos(bounce) * ((velocity > 10)? velocity : 10),
+                Math.sin(bounce) * ((velocity > 10)? velocity : 10),
+            );
+            this.vect.step(true, false); return;
+        }
+
+        const dist1 = (!this._destroy)? distance2(this.pos, collect1) : Infinity;
+        if (dist1 <= 50) {
+            add_cache(this.orb.value*this.orb.total);
+            this._destroy = true;
+        }
+        const dist2 = (!this._destroy)? distance2(this.pos, collect2) : Infinity;
+        if (dist2 <= 50) {
+            add_cache(this.orb.value*this.orb.total*2);
+            this._destroy = true;
+        }
+        const dist3 = (!this._destroy)? distance2(this.pos, collect3) : Infinity;
+        if (dist3 <= 50) {
+            add_cache(this.orb.value*this.orb.total*5);
+            this._destroy = true;
+        }
+
+        if (this._destroy) {
+            const res = perc_chance(D.prest_upgr_values[0]);
+            for (let i = 0; i < res.over; i++) emit_orb();
+            if (res.rand) emit_orb();
+            if (!this.cull) total_drawn--;
+            return;
+        } else {
+            const pull1 = collecter_pull(this, collect1);
+            const pull2 = collecter_pull(this, collect2);
+            const pull3 = collecter_pull(this, collect3);
+
+            this.vect.x += pull1.x + pull2.x + pull3.x; 
+            this.vect.y += pull1.y + pull2.y + pull3.y;
+        }
+
+
+        const sx = this.pos.x;
+        const sy = this.pos.y;
+        if (sx <= 0) {
+            this.vect.x *= (this.vect.x > 50)? -0.3 : -0.9;
+            this.pos.x = 1;
+        }
+        if (sy <= 0) {
+            this.vect.y *= (this.vect.y > 50)? -0.3 : -0.9;
+            this.pos.y = 1;
+        }
+        if (sx >= canvas.width) {
+            this.vect.x *= (this.vect.x > 50)? -0.3 : -0.9;
+            this.pos.x = canvas.width-1;
+        }
+        if (sy >= canvas.height) {
+            this.vect.y *= (this.vect.y > 50)? -0.3 : -0.9;
+            this.pos.y = canvas.height-1;
+        }
+
+        this.vect.step(true, false);
+    }
+}
+
+// entities.push(new Orb_Ent(entities.length, 1, {x:10, y:5}, D.orbs[0]));
+
+const entity_cap = 20000;
+const steps = 2;
+
+let cash_cache = 0;
+const add_cache = (num, flush=false)=>{
+    if (flush) {
+        D.cash += cash_cache;
+        cash_cache = 0;
+        return;
+    }
+    if (entities.length < 200) {
+        D.cash += num; 
+        return;
+    }
+    cash_cache += num;
+    if (cash_cache > D.cash /10) {
+        D.cash += cash_cache;
+        cash_cache = 0;
+    }
+}
 
 const collect1 = { x: 75, y: canvas.height-75, G: 50000 };
 const collect2 = { x: canvas.width-75, y: 75, G: 40000 };
 const collect3 = { x: canvas.width-75, y: canvas.height-75, G: 30000 };
 
-const repulse1_pos = { x: canvas.width/2, y: canvas.height/2 };
+const repulse1 = { x: canvas.width/2, y: canvas.height/2, size: 110 };
 
 let clicked = false;
 let last_click = 0;
 
 const collecter_pull = (self, col)=>{
-    const dist1 = distance2(self.vector, col);
-    const angle1 = get_angle(self.vector, col);
-    const vx = col.G*(Math.cos(angle1)/(dist1 * dist1));
-    const vy = col.G*(Math.sin(angle1)/(dist1 * dist1));
+    const dist = distance2(self.pos, col); 
+    const angle = get_angle(self.pos, col);
 
-    self.physics.add_force(vx, vy);
+    const vx = col.G*(Math.cos(angle)/(dist * dist));
+    const vy = col.G*(Math.sin(angle)/(dist * dist));
 
-    return distance2(self.vector, col);
+    return {x: vx, y: vy};
 }
+
 const rand_orb = (list=[new Orb()])=>{
         let max = 0;
         for (let i = 0; i < list.length; i++) max += list[i].weight;
@@ -48,100 +184,20 @@ const perc_chance = (perc=0)=>{
     const rand = Math.ceil(Math.random()*100);
     return {over: over, rand: (rand <= mod)};
 }
-const emit_orb = function(e) {
-    if (entities.length > entity_cap) return;
-
+const emit_orb = function(pass_cap=false) { // D.
     const orb = rand_orb(D.orbs);
-
-    const part = new Entity()
-    .bind(new Vector2(40, 40))
-    .bind(new Transform(0, 1,1))
-    .bind(new Graphic((self)=>{ draw_circ(0, 0, 10, orb.color, true); }))
-    .bind({ orb: orb, tag: "orb",
-        update(self) {
-            self.graphic.draw(self);
-
-            const dist_rep = distance2(self.vector, repulse1_pos);
-            const repulse_size = 115;
-            if (dist_rep <= repulse_size) { // Hit repulser
-                const angle_to = get_angle(self.vector, repulse1_pos); 
-                const angle_vect = get_angle(self.vector, { x: self.vector.x + self.physics.vx, y: self.vector.y + self.physics.vy });
-                const angle_away = angle_to + Math.PI;
-                const angle_bounce = angle_away+(angle_to - angle_vect);
-                const velocity = distance(self.vector.x, self.vector.y, self.vector.x + self.physics.vx, self.vector.y + self.physics.vy);
-                self.vector.x = repulse1_pos.x + Math.cos(angle_away)*repulse_size;
-                self.vector.y = repulse1_pos.y + Math.sin(angle_away)*repulse_size;
-
-                self.physics.add_force(
-                    Math.cos(angle_bounce) * (velocity*2),
-                    Math.sin(angle_bounce) * (velocity*2),
-                );
-                self.physics.vx *= 0.9;
-                self.physics.vy *= 0.9;
-                self.physics.step(true, false);
-                return;
-            }
-
-            const dist1 = collecter_pull(self, collect1);
-            if (dist1 <= 50) {
-                D.cash += self.orb.value*self.orb.total;
-                self._destroy = true;
-            }
-            const dist2 = collecter_pull(self, collect2);
-            if (dist2 <= 50) {
-                D.cash += self.orb.value*self.orb.total*2;
-                self._destroy = true;
-            }
-            const dist3 = collecter_pull(self, collect3);
-            if (dist3 <= 50) {
-                D.cash += self.orb.value*self.orb.total*5;
-                self._destroy = true;
-            }
-
-            if (self._destroy) {
-                const res = perc_chance(D.prest_upgr_values[0]);
-                for (let i = 0; i < res.over; i++) emit_orb();
-                if (res.rand) emit_orb();
-                return;
-            }
-
-            const sx = self.vector.x;
-            const sy = self.vector.y;
-            if (sx <= 0) {
-                self.physics.vy *= (self.physics.vx > 50)? -0.3 : -0.9;
-                self.physics.vx *= -0.9;
-                self.vector.x = 1;
-            }
-            if (sy <= 0) {
-                self.physics.vy *= (self.physics.vy > 50)? -0.3 : -0.9;
-                self.physics.vy *= -0.9;
-                self.vector.y = 1;
-            }
-            if (sx >= canvas.width) {
-                self.physics.vy *= (self.physics.vx > 50)? -0.3 : -0.9;
-                self.physics.vx *= -0.9;
-                self.vector.x = canvas.width-1;
-            }
-            if (sy >= canvas.height) {
-                self.physics.vy *= (self.physics.vy > 50)? -0.3 : -0.9;
-                self.vector.y = canvas.height-1;
-            }
-
-            self.physics.step(true, false);
-        }
-    });
-    const vx = Math.ceil(Math.random() * 20);
-    const vy = Math.ceil(Math.random() * 15);
-
+    if (entities.length > entity_cap && !pass_cap) {
+        add_cache(orb.value*orb.total);
+        return;
+    }
 
     const angle = Math.floor(Math.random()*140)/100;
-    const vel = (Math.ceil(Math.random() * 5)+10*(1+D.prest_upgr_values[3]));
+    // const angle = get_angle({x: 0, y: 0}, mouse.pos);
+    const vel = (Math.random() * 5+10*(1+D.prest_upgr_values[3]));
     const ox = Math.cos(angle)*vel;
     const oy = Math.sin(angle)*vel;
 
-    part.bind(new Physics(ox, oy, 0, 0.98, part.vector));
-
-    // console.log(part);
+    entities.push(new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, do_cull()));
 }; $("#canvas").onclick = (e)=> {
     if (!clicked) clicked = true;
     const now = Date.now();
@@ -162,7 +218,7 @@ const emit_orb = function(e) {
 }
 
 const loop_emit = (amount)=>{
-    for (let i = 0; i < amount; i++) emit_orb();
+    for (let i = 0; i < amount; i++) emit_orb(true);
 }
 
 update.push(()=>{ // Draw spawner
@@ -186,34 +242,44 @@ update.push(()=>{ // Draw spawner
     // ctx.lineTo(0, 75);
     // ctx.lineTo(75, 0);
 });
+
 update.push(()=>{ // Draw collecters and repulsers
     draw_circ(collect1.x, collect1.y, 30, "grey", true);
     draw_circ(collect2.x, collect2.y, 30, "#008800", true);
     draw_circ(collect3.x, collect3.y, 30, "#bbbb00", true);
 
-    draw_circ(repulse1_pos.x, repulse1_pos.y, 100, "lime", true);
-    draw_circ(repulse1_pos.x, repulse1_pos.y, 95, "black", true);
-
+    draw_circ(repulse1.x, repulse1.y, 100, "lime", true);
+    draw_circ(repulse1.x, repulse1.y, 95, "black", true);
+    
     draw_text(collect1.x, collect1.y+8, `x1`, "30px arial", "black", "center");
     draw_text(collect2.x, collect2.y+8, `x2`, "30px arial", "white", "center");
     draw_text(collect3.x, collect3.y+8, `x5`, "30px arial", "black", "center");
 
-    // draw_circ(repulse1_pos.x, repulse1_pos.y, 5, "pink", true);
+
+    
+
+    // line_from_angle({x: 100, y: 100}, Math.acos(4/5), 100, "aqua");
 });
 update.push(()=>{
     if (clicked) return;
     draw_text(canvas.width/2-10, canvas.height/4-10, `Click Here!`, "30px arial", "black", "center");
 });
+update.push(()=>{
+    // for (let i = 0; i < entities.length; i++) {
+    //     const pos = entities[i].pos;
+    //     draw_circ2(pos, 10, "grey", true);
+    // }
+});
 
 let idle_ticks = 0;
 update.push(()=>{
     if (D.idle_orb_sec <= 0) return;
-    const floored = Math.floor(D.idle_orb_sec/33);
-    const extra = D.idle_orb_sec % 33;
+    const floored = Math.floor(D.idle_orb_sec/60);
+    const extra = D.idle_orb_sec % 60;
 
     for (let i = 0; i < floored; i++) emit_orb();
 
-    const t = 33 / extra;
+    const t = 60 / extra;
     idle_ticks++;
     if (idle_ticks >= t) {
         idle_ticks = 0;
@@ -225,13 +291,19 @@ document.onkeyup = (e)=>{
     const k = e.key;
     if (k == " ") pause = !pause;
     else if (k == "s") step = true;
+    else if (k == "1") tabs[0].onclick();
+    else if (k == "2") tabs[1].onclick();
+    else if (k == "3") tabs[2].onclick();
+    else if (k == "R") local.clear_storage();
 }
 
 // D.frame = 0;
+let worst_frame = 0;
 let pause = false;
 let step = false;
+let m_secs = 0;
 const main_loop = setInterval(() => {
-    // const now = Date.now();
+    const now = Date.now();
     if (pause && !step) return;
     if (step) {
         step = false;
@@ -242,5 +314,10 @@ const main_loop = setInterval(() => {
         console.log(error);
         pause=true;
     }
-    // D.frame = Date.now()-now;
-}, 1000/30);
+    worst_frame = Math.max(Date.now()-now, worst_frame);
+
+    if (m_secs >= 1000) {
+        add_cache(0, true);
+        m_secs = 0;
+    } else m_secs += 1000/60;
+}, 1000/60);

@@ -1,8 +1,11 @@
 //#region [> Tab and Section <]
 const tabs = $all(".tab");
 const sections = $all(".section");
+// let in_prest = false;
 
 const toggle_tabs = (keep=0)=>{
+    if (keep == 2) in_prest = true;
+    else in_prest = false;
     for (let i = 0; i < tabs.length; i++) {
         const e = tabs[i];
         if (i != keep) e.classList.remove("in-sect");
@@ -26,7 +29,7 @@ const hide_sections = (keep=0)=>{
             hide_sections(i);
         }
     }
-})(); tabs[2].onclick();
+})(); tabs[0].onclick();
 //#endregion
 
 //#region [> Clicking Orbs <]
@@ -81,7 +84,7 @@ const idle_btns = $all("#upgr-idle .btn");
 idle_btns[0].onclick = ()=>{
     if (D.cash < D.idle_orb_cost) return;
     D.cash -= D.idle_orb_cost;
-    D.idle_orb_cost = Math.round(D.idle_orb_cost * 0.25);
+    D.idle_orb_cost = Math.round(D.idle_orb_cost * 1.25);
     D.idle_orb_sec += 1;
 }
 

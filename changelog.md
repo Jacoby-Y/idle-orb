@@ -1,3 +1,7 @@
+## v0.2
+- Optimized the shiz outa the physics/rendering engine
+- More balance changes to orb values.
+
 ## v0.1
 - Added prestige functionality and prestige upgrades that work.
 
