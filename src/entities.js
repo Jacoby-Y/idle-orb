@@ -301,7 +301,7 @@ document.onkeyup = (e)=>{
 let worst_frame = 0;
 let pause = false;
 let step = false;
-let m_secs = 0;
+let m_secs = 1000;
 const main_loop = setInterval(() => {
     const now = Date.now();
     if (pause && !step) return;
