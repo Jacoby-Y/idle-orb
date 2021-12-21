@@ -15,7 +15,8 @@ body {
 main {
     display: grid;
     grid-template-rows: max-content max-content 1fr;
-    min-width: max-content;
+    /* min-width: max-content; */
+    /* width: min-content; */
 }
 #cash-mana {
     display: grid;
@@ -140,3 +141,23 @@ main {
 }
 #prestige .btn:hover { background-color: #85ffff; }
 #prestige .btn:active { background-color: #afffff; }
+
+#console {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding: 0.5rem 0.7rem;
+    background-color: #121212;
+    color: white;
+    width: 60%;
+    height: max-content;
+    max-height: 99vh;
+    display: none;
+    overflow-y: scroll;
+    border-top: 2px solid purple;
+    border-right: 2px solid purple;
+} 
+#console h3 {
+    width: 100%;
+    font-weight: normal;
+}

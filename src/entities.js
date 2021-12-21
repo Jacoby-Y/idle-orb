@@ -38,7 +38,8 @@ class Orb_Ent {
     }
     update() {
         // if (!this.cull) draw_circ2(this.pos, 10, this.orb.color, true);
-        if (!this.cull) draw.rect(this.pos.x-10, this.pos.y-10, 20, 20, { fill: true, fillStyle: this.orb.color });
+        // if (!this.cull) draw.rect(this.pos.x-10, this.pos.y-10, 20, 20, { fill: true, fillStyle: this.orb.color });
+        if (!this.cull) draw_polygon(this.pos.x, this.pos.y, 10, 10, this.orb.color);
 
         const dist_rep = distance2(this.pos, repulse1);
         if (dist_rep <= repulse1.size) { // Hit repulser
@@ -125,7 +126,7 @@ class Orb_Ent {
 
 // entities.push(new Orb_Ent(entities.length, 1, {x:10, y:5}, D.orbs[0]));
 
-const entity_cap = 20000;
+const entity_cap = 5000;
 const steps = 2;
 
 let cash_cache = 0;
@@ -156,7 +157,7 @@ let clicked = false;
 let last_click = 0;
 
 const collecter_pull = (self, col)=>{
-    const dist = distance2(self.pos, col); 
+    const dist = distance2(self.pos, col); // hyp
     const angle = get_angle(self.pos, col);
 
     const vx = col.G*(Math.cos(angle)/(dist * dist));
@@ -186,7 +187,7 @@ const perc_chance = (perc=0)=>{
 }
 const emit_orb = function(pass_cap=false) { // D.
     const orb = rand_orb(D.orbs);
-    if (entities.length > entity_cap && !pass_cap) {
+    if (entities.length >= entity_cap && !pass_cap) {
         add_cache(orb.value*orb.total);
         return;
     }
@@ -214,7 +215,6 @@ const emit_orb = function(pass_cap=false) { // D.
     } else {
         emit_orb(e);
     }
-
 }
 
 const loop_emit = (amount)=>{
@@ -256,8 +256,6 @@ update.push(()=>{ // Draw collecters and repulsers
     draw_text(collect3.x, collect3.y+8, `x5`, "30px arial", "black", "center");
 
 
-    
-
     // line_from_angle({x: 100, y: 100}, Math.acos(4/5), 100, "aqua");
 });
 update.push(()=>{
@@ -271,43 +269,78 @@ update.push(()=>{
     // }
 });
 
-let idle_ticks = 0;
-update.push(()=>{
-    if (D.idle_orb_sec <= 0) return;
-    const floored = Math.floor(D.idle_orb_sec/60);
-    const extra = D.idle_orb_sec % 60;
+const idle_run = ()=>{
+    setTimeout(() => {
+        if (Math.random()*100 <= D.burst_fire_perc) for (let i = 0; i < D.burst_fire_amount; i++) emit_orb();
+        else emit_orb();
+        idle_run();
+    }, 1000/D.idle_orb_sec);
+}; if (D.idle_orb_sec > 0) idle_run();
 
-    for (let i = 0; i < floored; i++) emit_orb();
+const cons = $("#console");
+const cons_input = $all("#console h3")[0];
+const cons_output = $all("#console h3")[1];
 
-    const t = 60 / extra;
-    idle_ticks++;
-    if (idle_ticks >= t) {
-        idle_ticks = 0;
-        emit_orb();
-    }
-});
+let cons_open = false;
+let showing_out = false;
 
-document.onkeyup = (e)=>{
+let last_log = "";
+
+document.onkeydown = (e)=>{
     const k = e.key;
+    // console.log(e);
+    if (k == "~") {
+        cons_open = !cons_open;
+        cons.style.display = (cons_open)? "block" : "none";
+        return;
+    }
+    if (cons_open) {
+        if (k == "ArrowUp") {
+            cons_input.innerText = `> ${last_log}`;
+        } else if (k == "ArrowDown") {
+            cons_input.innerText = "> ";
+        }
+        if (k == "Enter") {
+            last_log = cons_input.innerText.slice(1);
+            cons_output.innerText = `: ${eval(last_log)}`;
+            cons_input.innerText = "> ";
+            showing_out = true;
+            return;
+        } if (k == "Backspace") {
+            if (cons_input.innerText.length <= 1) return;
+            cons_input.innerText = cons_input.innerText.slice(0, -1);
+            return;
+        }
+        if (k.length > 1) return;
+        if (showing_out) {
+            cons_input.innerText = "> ";
+            cons_output.innerText = ": ";
+            showing_out = false;
+        }
+        cons_input.innerText += (k == " ")? "\xa0" : k;
+        return;
+    }
+
     if (k == " ") pause = !pause;
     else if (k == "s") step = true;
     else if (k == "1") tabs[0].onclick();
     else if (k == "2") tabs[1].onclick();
     else if (k == "3") tabs[2].onclick();
     else if (k == "R") local.clear_storage();
+    else if (k == "l") loop_emit(max_drawn);
+    else if (k == ";") loop_emit(1000);
+    else if (k == "'") loop_emit(10000);
 }
 
 // D.frame = 0;
 let worst_frame = 0;
 let pause = false;
 let step = false;
-let m_secs = 0;
+let m_secs = 1000;
 const main_loop = setInterval(() => {
     const now = Date.now();
     if (pause && !step) return;
-    if (step) {
-        step = false;
-    }
+    if (step) step = false;
     try {
         main_func();
     } catch (error) {
@@ -320,4 +353,8 @@ const main_loop = setInterval(() => {
         add_cache(0, true);
         m_secs = 0;
     } else m_secs += 1000/60;
-}, 1000/60);
+}, 1000/50);
+
+setInterval(()=>{
+    D.ent_len = entities.length.toString() + " | " + worst_frame + " | " + ((pause)? "T" : "F");
+}, 250);

@@ -4,7 +4,7 @@ const sections = $all(".section");
 // let in_prest = false;
 
 const toggle_tabs = (keep=0)=>{
-    if (keep == 2) in_prest = true;
+    if (keep == 2) { in_prest = true; D.cash = D.cash; }
     else in_prest = false;
     for (let i = 0; i < tabs.length; i++) {
         const e = tabs[i];
@@ -39,11 +39,16 @@ const get_weight = (list)=>{
     for (let i = 0; i < list.length; i++) total += list[i].weight;
     return total;
 }
+const calc_weight = (weight)=>{
+    let total = 0;
+    for (let i = 0; i < D.orbs.length; i++) total += D.orbs[i].weight;
+    return Math.round(weight/total*1000)/10;
+}
 let total_weight = get_weight(D.orbs);
 
 const orb_btns = $all("#upgr-orbs .btn");
-
-const orb_html = (e, orb)=> e.innerHTML = `<h3>Value +${orb.per_upgr}: $${format_num(orb.up_cost)}</h3><h3>${Math.round(orb.weight/total_weight*1000)/10}% | (${format_num(orb.value*orb.total)}) </h3>`;
+//Math.round(orb.weight/total_weight*1000)/10
+const orb_html = (e, orb)=> e.innerHTML = `<h3>Value +${orb.per_upgr}: $${format_num(orb.up_cost)}</h3><h3>${calc_weight(orb.weight)}% | (${format_num(orb.value*orb.total)}) </h3>`;
 
 const update_orb_btns = ()=>{
     for (let i = 0; i < orb_btns.length; i++) {
@@ -84,8 +89,21 @@ const idle_btns = $all("#upgr-idle .btn");
 idle_btns[0].onclick = ()=>{
     if (D.cash < D.idle_orb_cost) return;
     D.cash -= D.idle_orb_cost;
-    D.idle_orb_cost = Math.round(D.idle_orb_cost * 1.25);
+    D.idle_orb_cost = Math.round(D.idle_orb_cost * 1.5);
     D.idle_orb_sec += 1;
+    if (D.idle_orb_sec == 1) idle_run();
+}
+idle_btns[1].onclick = ()=>{
+    if (D.cash < D.burst_fire_perc_cost) return;
+    D.cash -= D.burst_fire_perc_cost;
+    D.burst_fire_perc_cost = Math.round(D.burst_fire_perc_cost * 1.5);
+    D.burst_fire_perc += 1;
+}
+idle_btns[2].onclick = ()=>{
+    if (D.cash < D.burst_fire_amount_cost) return;
+    D.cash -= D.burst_fire_amount_cost;
+    D.burst_fire_amount_cost = Math.round(D.burst_fire_amount_cost * 1.5);
+    D.burst_fire_amount += 1;
 }
 
 //#endregion
@@ -105,7 +123,10 @@ prest_btns[0].onclick = ()=>{
             D[k] = v;
         }
     }
-    total_weight = get_weight(D.orbs);
+
+    entities.splice(0, entities.length);
+    D.cash += D.prest_upgr_values[4];
+    total_weight = 1;
     update_orb_btns();
 }
 
@@ -131,6 +152,9 @@ prest_btns[3].onclick = ()=>{ // shotgun #
 }
 prest_btns[4].onclick = ()=>{ // velocity
     upgr_prest_thing(3, 0.2, 1.5);
+}
+prest_btns[5].onclick = ()=>{ // start cash
+    upgr_prest_thing(4, 100, 1.2);
 }
 //#endregion
 

@@ -23,6 +23,7 @@
             <div .tab>Shop</div>
             <div .tab>Idle</div>
             <div .tab>Prestige</div>
+            <div .tab :w>{ent_len}</div>
         </div>
         <div #sections>
             <div .section #upgr-orbs>
@@ -35,9 +36,13 @@
             </div>
             <div .section #upgr-idle>
                 <div .btn><h3 :w>+1/sec: ${idle_orb_cost}</h3><h3 :w>({idle_orb_sec}/sec)</h3></div>
+                <div .btn><h3 :w>Burst fire +1%: ${burst_fire_perc_cost}</h3><h3 :w>({burst_fire_perc}%)</h3></div>
+                <div .btn><h3 :w>Burst fire amount +1: ${burst_fire_amount_cost}</h3><h3 :w>({burst_fire_amount})</h3></div>
             </div>
             <div .section #prestige>
-                <div .btn><h3 :w>{calc_mana, prest_cost => Mana +[0]: $[1] & start over}</h3>
+                <div .btn>
+                    <h3 :w>{calc_mana, prest_cost => Mana +[0]: $[1] & start over}</h3>
+                    <!-- <h3>Mana +<span :w>{calc_mana}</span>: $<span :w>{prest_cost}</span> & start over</h3> -->
                     <h3 .tip>Gives a change to spawn another orb when one is collected</h3>
                 </div>
                 <div .btn|upgr><h3 :w>Recycle +1%: {prest_upgr_costs:0} mana</h3><h3 .info>?</h3>
@@ -56,9 +61,17 @@
                     <h3 .tip :w>Increases the starting velocity of the orbs<br>
                     Current: {prest_upgr_values:3}%</h3>
                 </div>
+                <div .btn|upgr><h3 :w>Starting Cash +100: {prest_upgr_costs:4} mana</h3><h3 .info>?</h3>
+                    <h3 .tip :w>Increases the amount of cash you start with<br>
+                    Current: {prest_upgr_values:4}%</h3>
+                </div>
             </div>
         </div>
     </main>
     <canvas #canvas></canvas>
+    <div #console>
+        <h3>&gt; </h3>
+        <h3>: </h3>
+    </div>
 </body>
 </html>
