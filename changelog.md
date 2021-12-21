@@ -1,4 +1,7 @@
-# v0.3
+## V0.3.1
+- Balancing changes to prestige
+
+## v0.3
 - Bug squashing
 - Added custom dev console
 - Added more upgrades to idle section

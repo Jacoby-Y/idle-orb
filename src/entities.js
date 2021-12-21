@@ -255,6 +255,9 @@ update.push(()=>{ // Draw collecters and repulsers
     draw_text(collect2.x, collect2.y+8, `x2`, "30px arial", "white", "center");
     draw_text(collect3.x, collect3.y+8, `x5`, "30px arial", "black", "center");
 
+    // const ang = F_acos(100/-151)+ Math.PI;
+    // line_from_angle(repulse1, ang, 300, "aqua");
+
 
     // line_from_angle({x: 100, y: 100}, Math.acos(4/5), 100, "aqua");
 });
