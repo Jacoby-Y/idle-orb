@@ -42,9 +42,10 @@ class Orb_Ent {
         if (!this.cull) draw_polygon(this.pos.x, this.pos.y, 10, 10, this.orb.color);
 
         const dist_rep = distance2(this.pos, repulse1);
-        if (dist_rep <= repulse1.size) { // Hit repulser
+        if (dist_rep <= repulse1.size+5) { // Hit repulser
             const velocity = distance(this.pos.x, this.pos.y, this.pos.x + this.vect.x, this.pos.y + this.vect.y);
-            const normal = get_angle(repulse1, this.pos) + Math.PI*2;
+            const normal = get_angle(repulse1, this.pos, dist_rep) + Math.PI*2;
+            //line_from_angle(this.pos, normal, 100, "aqua");
             const vector = get_angle(this.pos, {x: this.pos.x + this.vect.x, y: this.pos.y + this.vect.y})+Math.PI;
             // const tangent = normal+Math.PI/2;
 
@@ -147,19 +148,24 @@ const add_cache = (num, flush=false)=>{
     }
 }
 
-const collect1 = { x: 75, y: canvas.height-75, G: 50000 };
-const collect2 = { x: canvas.width-75, y: 75, G: 40000 };
-const collect3 = { x: canvas.width-75, y: canvas.height-75, G: 30000 };
+const collect1 = { x: 75, y: canvas.height-75, G: 50000, color: "grey" };
+const collect2 = { x: canvas.width-75, y: 75, G: 40000, color: "green" };
+const collect3 = { x: canvas.width-75, y: canvas.height-75, G: 30000, color: "gold" };
 
-const repulse1 = { x: canvas.width/2, y: canvas.height/2, size: 110 };
+const repulse1 = { x: canvas.width/2, y: canvas.height/2, size: Math.round(canvas.height/6)-5 };
 
 let clicked = false;
 let last_click = 0;
 
 const collecter_pull = (self, col)=>{
     const dist = distance2(self.pos, col); // hyp
-    const angle = get_angle(self.pos, col);
-
+    //const angle = get_angle(self.pos, col);
+    const dx = col.x - self.pos.x;
+    const dy = col.y - self.pos.y;
+    const check = F_acos(dx / dist);
+    const angle = (dy < 0)? check*-1 : check;
+    //line_from_angle(self.pos, angle, 100, col.color);
+    
     const vx = col.G*(Math.cos(angle)/(dist * dist));
     const vy = col.G*(Math.sin(angle)/(dist * dist));
 
@@ -194,7 +200,7 @@ const emit_orb = function(pass_cap=false) { // D.
 
     const angle = Math.floor(Math.random()*140)/100;
     // const angle = get_angle({x: 0, y: 0}, mouse.pos);
-    const vel = (Math.random() * 5+10*(1+D.prest_upgr_values[3]));
+    const vel = ((Math.random()*5 + 5)*(1+D.prest_upgr_values[3]));
     const ox = Math.cos(angle)*vel;
     const oy = Math.sin(angle)*vel;
 
@@ -221,7 +227,16 @@ const loop_emit = (amount)=>{
     for (let i = 0; i < amount; i++) emit_orb(true);
 }
 
-update.push(()=>{ // Draw spawner
+const count_drawn = ()=>{ 
+    let totalc = 0;
+     for (let i = 0; i < entities.length; i++) {
+         const cull = entities[i].cull;
+         if (cull == false) totalc++;
+    }
+    return totalc;
+}
+
+const draw_simples = ()=>{
     ctx.beginPath();
     ctx.fillStyle = "black"; // Green fill
     ctx.moveTo(0, 0);
@@ -238,18 +253,13 @@ update.push(()=>{ // Draw spawner
     ctx.closePath();
     ctx.fill();
 
-    // ctx.moveTo(0, 0);
-    // ctx.lineTo(0, 75);
-    // ctx.lineTo(75, 0);
-});
 
-update.push(()=>{ // Draw collecters and repulsers
-    draw_circ(collect1.x, collect1.y, 30, "grey", true);
-    draw_circ(collect2.x, collect2.y, 30, "#008800", true);
-    draw_circ(collect3.x, collect3.y, 30, "#bbbb00", true);
+    draw_circ2(collect1, 30, "grey", true);
+    draw_circ2(collect2, 30, "#008800", true);
+    draw_circ2(collect3, 30, "#bbbb00", true);
 
-    draw_circ(repulse1.x, repulse1.y, 100, "lime", true);
-    draw_circ(repulse1.x, repulse1.y, 95, "black", true);
+    draw_circ2(repulse1, repulse1.size, "lime", true);
+    draw_circ2(repulse1, repulse1.size-5, "black", true);
     
     draw_text(collect1.x, collect1.y+8, `x1`, "30px arial", "black", "center");
     draw_text(collect2.x, collect2.y+8, `x2`, "30px arial", "white", "center");
@@ -260,25 +270,23 @@ update.push(()=>{ // Draw collecters and repulsers
 
 
     // line_from_angle({x: 100, y: 100}, Math.acos(4/5), 100, "aqua");
-});
-update.push(()=>{
+
+
     if (clicked) return;
     draw_text(canvas.width/2-10, canvas.height/4-10, `Click Here!`, "30px arial", "black", "center");
-});
-update.push(()=>{
-    // for (let i = 0; i < entities.length; i++) {
-    //     const pos = entities[i].pos;
-    //     draw_circ2(pos, 10, "grey", true);
-    // }
-});
+}; update.push(draw_simples);
+
 
 const idle_run = ()=>{
     setTimeout(() => {
+        if (D.idle_orb_sec <= 0) return;
+        if (pause) { idle_run(); return; }
         if (Math.random()*100 <= D.burst_fire_perc) for (let i = 0; i < D.burst_fire_amount; i++) emit_orb();
         else emit_orb();
         idle_run();
     }, 1000/D.idle_orb_sec);
 }; if (D.idle_orb_sec > 0) idle_run();
+
 
 const cons = $("#console");
 const cons_input = $all("#console h3")[0];
@@ -300,12 +308,20 @@ document.onkeydown = (e)=>{
     if (cons_open) {
         if (k == "ArrowUp") {
             cons_input.innerText = `> ${last_log}`;
+            showing_out = false;
         } else if (k == "ArrowDown") {
             cons_input.innerText = "> ";
         }
         if (k == "Enter") {
             last_log = cons_input.innerText.slice(1);
-            cons_output.innerText = `: ${eval(last_log)}`;
+            const ev = eval(last_log);
+            // if (typeof ev == "object") cons_output.innerText = `: ${JSON.Stringify(ev)}`;
+            if (
+                typeof ev === 'object' &&
+                !Array.isArray(ev) &&
+                ev !== null
+            ) { cons_output.innerText = `: ${JSON.stringify(ev)}`; }
+            else cons_output.innerText = `: ${ev}`;
             cons_input.innerText = "> ";
             showing_out = true;
             return;

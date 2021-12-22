@@ -1,4 +1,9 @@
-## V0.3.1
+## v0.3.2
+- Scaled graphics
+- Optimized trig
+- Reorganized code
+
+## v0.3.1
 - Balancing changes to prestige
 
 ## v0.3
