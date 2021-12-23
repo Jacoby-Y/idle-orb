@@ -1,3 +1,5 @@
+const setOpacity = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
+
 class Orb_Ent {
     constructor(index, drag=0.98, vect={x:1,y:1}, orb=new Orb(), cull=false) {
         this.cull = cull;
@@ -24,8 +26,10 @@ class Orb_Ent {
         // if (!this.cull) draw_circ2(this.pos, 10, this.orb.color, true);
         if (!this.cull && D.draw_setting == 0) draw_polygon(this.pos.x, this.pos.y, 7, 10, this.orb.color);
         else if (!this.cull && D.draw_setting == 1) draw.rect(this.pos.x-10, this.pos.y-10, 20, 20, { fill: true, fillStyle: this.orb.color });
-        else if (!this.cull && D.draw_setting == 2) draw.rect(Math.floor((this.pos.x-10)/20)*20, Math.floor((this.pos.y-10)/20)*20, 20, 20, { fill: true, fillStyle: this.orb.color });
+        // else if (!this.cull && D.draw_setting == 2) draw.rect(Math.floor((this.pos.x-10)/64)*64, Math.floor((this.pos.y-10)/64)*64, 64, 64, { fill: true, fillStyle: (this.orb.color+"80") });
+        else if (!this.cull && D.draw_setting == 2) draw.rect(Math.floor((this.pos.x-10)/20)*20, Math.floor((this.pos.y-10)/20)*20, 20, 20, { fill: true, fillStyle: (this.orb.color+"aa") });
         else if (!this.cull && D.draw_setting == 3) draw.rect(this.pos.x-10, this.pos.y-10, 3, 3, { fill: true, fillStyle: this.orb.color });
+        // else if (!this.cull && D.draw_setting == 3) draw.rect(this.pos.x-10, this.pos.y-10, 3, 3, { fill: true, fillStyle: this.orb.color });
         
 
         //#region [> Collecter & Repulser <]
@@ -172,10 +176,11 @@ const rand_orb = (list=[new Orb()])=>{
 }
 
 const perc_chance = (perc=0)=>{
+    if (perc <= 0) return {over: 0, rand: 0};
     const over = Math.floor(perc/100);
     const mod = perc%100;
     const rand = Math.ceil(Math.random()*100);
-    return {over: over, rand: (rand <= mod)};
+    return {over: over, rand: (rand <= mod), min_one: ((rand <= mod) || over > 0)};
 }
 
 const emit_orb = function(pass_cap=false) {
@@ -194,8 +199,15 @@ const emit_orb = function(pass_cap=false) {
     const cull_draw = (total_drawn < max_drawn)? false : true;
 
     if (!cull_draw) total_drawn++;
+    const is_magic = perc_chance(D.prest_upgr_values[4]).min_one;
+    const new_orb = new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, cull_draw);
+    if (is_magic) { 
+        new_orb.magic = true;
+        new_orb.orb.color = "#ff0000";
+    }
+    else new_orb.magic = false;
 
-    entities.push(new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, cull_draw));
+    entities.push(new_orb);
     // entities.push(new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, do_cull()));
 }; 
 $("#canvas").onclick = (e)=> {

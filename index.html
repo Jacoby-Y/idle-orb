@@ -60,8 +60,8 @@
                     <h3 .tip :w>Increases the starting velocity of the orbs<br>
                     Current: {prest_upgr_values:3}%</h3>
                 </div>
-                <div .btn|upgr><h3 :w>Starting Cash +100: {prest_upgr_costs:4} mana</h3><h3 .info>?</h3>
-                    <h3 .tip :w>Increases the amount of cash you start with<br>
+                <div .btn|upgr><h3 :w>Magic Orb +1%: {prest_upgr_costs:4} mana</h3><h3 .info>?</h3>
+                    <h3 .tip :w>Increase chance to spawn a "Magic Ball", which is worth 10% of your total cash<br>
                     Current: {prest_upgr_values:4}%</h3>
                 </div>
             </div>
@@ -75,9 +75,9 @@
         <div #sections>
             <div .section #debug>
                 <h3 :w>Paused: {debug:0}</h3>
-                <h3 :w>Total entities: {debug:1}</h3>
+                <h3 :w>Total entities: {F+debug:1}</h3>
                 <h3 :w>Total drawn entities: {debug:2}</h3>
-                <h3 :w>Cash last second: {debug:3}</h3>
+                <h3 :w>Average cash/sec: {F+debug:3}</h3>
             </div>
             <div .section #settings>
                 <h3 .btn-title>Render Mode</h3>

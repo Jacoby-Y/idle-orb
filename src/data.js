@@ -37,17 +37,16 @@ D.ent_len = entities.length;
 //#region [> Orb Stuff <]
 //* Clicking
 class Orb {
-    constructor(color, weight, value, up_cost, per_upgr, total = 0) {
+    constructor(color, weight, value, up_cost, per_upgr) {
         this.color = color;
         this.weight = weight;
         this.value = value;
         this.up_cost = up_cost;
         this.per_upgr = per_upgr;
-        this.total = total;
     }
 }
 
-const orb_colors = ["#aaa", "#00ee33", "#9999ff", "#dd55dd", "#ff722b", "#ffc23d"];
+const orb_colors = ["#aaaaaa", "#00ee33", "#9999ff", "#dd55dd", "#ff722b", "#ffc23d"];
 D.orbs = [
     // (    color,         weight,   value,   upgrade cost,   per upgrade value)
     new Orb(orb_colors[0], 1,        0.1,     5,              0.1),

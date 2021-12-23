@@ -1,3 +1,10 @@
+# v0.4.1
+- Stylistic changes / cool things
+- Squashed web_mono_lib bugs
+- Switched out prestige upgrade for "magic orbs"
+- Better cash per second text
+
+
 ## v0.4
 - Changed theme to "dark"
 - Added new menu section and canvas moving system

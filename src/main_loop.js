@@ -158,9 +158,13 @@ const main_loop = setInterval(() => {
     } else m_secs += 1000/60;
 }, 1000/50);
 
+const average = (array) => array.reduce((a, b) => a + b) / array.length;
+
 let cash_made = D.cash;
+let cash_list = [0, 0, 0, 0];
 let loop_t = 0;
 setInterval(()=>{
+
     D.ent_len = entities.length.toString() + " | " + worst_frame + " | " + ((pause)? "T" : "F");
     D.debug[0] = pause.toString();
     D.debug[1] = entities.length.toString();
@@ -169,9 +173,11 @@ setInterval(()=>{
     
     D.debug = D.debug;
     
+    cash_list[loop_t] = Math.round((D.cash - cash_made)*10)/10;
+    D.debug[3] = Math.round((average(cash_list))*10)/10;
+    cash_made = D.cash;
     if (loop_t >= 3) {
-        D.debug[3] = Math.round((D.cash - cash_made)*10)/10;
-        cash_made = D.cash;
+        
         loop_t = 0;
     }
     else loop_t++;

@@ -14,7 +14,7 @@ let total_weight = get_weight(D.orbs);
 
 const orb_btns = $all("#upgr-orbs .btn");
 //Math.round(orb.weight/total_weight*1000)/10
-const orb_html = (e, orb)=> e.innerHTML = `<h3>Value +${orb.per_upgr}: $${format_num(orb.up_cost)}</h3><h3>${calc_weight(orb.weight)}% | (${format_num(orb.value*orb.total)}) </h3>`;
+const orb_html = (e, orb)=> e.innerHTML = `<h3>Value +${orb.per_upgr}: $${format_num(orb.up_cost)}</h3><h3>${calc_weight(orb.weight)}% | (${format_num(orb.value*orb.weight)}) </h3>`;
 
 const update_orb_btns = ()=>{
     for (let i = 0; i < orb_btns.length; i++) {
@@ -42,7 +42,6 @@ const update_orb_btns = ()=>{
             orb.up_cost = Math.round(orb.up_cost * 1.25);
             total_weight++;
             orb.weight++;
-            orb.total++;
             update_orb_btns();
         }
     }
@@ -92,7 +91,6 @@ prest_btns[0].onclick = ()=>{
 
     entities.splice(0, entities.length);
     cash_cache = 0;
-    D.cash += D.prest_upgr_values[4];
     total_weight = 1;
     update_orb_btns();
 }
@@ -120,8 +118,8 @@ prest_btns[3].onclick = ()=>{ // shotgun #
 prest_btns[4].onclick = ()=>{ // velocity
     upgr_prest_thing(3, 0.2, 1.5);
 }
-prest_btns[5].onclick = ()=>{ // start cash
-    upgr_prest_thing(4, 100, 1.2);
+prest_btns[5].onclick = ()=>{ // magic orb %
+    upgr_prest_thing(4, 10, 1.25);
 }
 //#endregion
 
