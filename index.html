@@ -6,15 +6,15 @@
 
     <script defer src="./src/data.js"></script>
     <script defer src="./src/entities.js"></script>
-    <script defer src="./src/app.js"></script>
-
-    <!-- <script type="./src/orb_update.js"></script> -->
+    <script defer src="./src/upgrade.js"></script>
+    <script defer src="./src/main_loop.js"></script>
+    <script defer src="./src/main_sections.js"></script>
 
     <link rel="stylesheet" href="./style.css">
     <title>Idle Orbs</title>
 </head>
 <body>
-    <main>
+    <div #main1>
         <div #cash-mana>
             <h3 #cash :w>Cash: {cash}</h3>
             <h3 #mana :w>Mana: {mana}</h3>
@@ -23,7 +23,6 @@
             <div .tab>Shop</div>
             <div .tab>Idle</div>
             <div .tab>Prestige</div>
-            <div .tab :w>{ent_len}</div>
         </div>
         <div #sections>
             <div .section #upgr-orbs>
@@ -67,7 +66,31 @@
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+    <div #main2>
+        <div #tabs>
+            <div .tab>Debug</div>
+            <div .tab>Settings</div>
+        </div>
+        <div #sections>
+            <div .section #debug>
+                <h3 :w>Paused: {debug:0}</h3>
+                <h3 :w>Total entities: {debug:1}</h3>
+                <h3 :w>Total drawn entities: {debug:2}</h3>
+                <h3 :w>Cash last second: {debug:3}</h3>
+            </div>
+            <div .section #settings>
+                <h3 .btn-title>Render Mode</h3>
+                <div .btn|split-5>
+                    <h3>Circles</h3>
+                    <h3>Squares</h3>
+                    <h3>Pixelated</h3>
+                    <h3>Sand</h3>
+                    <h3>None</h3>
+                </div>
+            </div>
+        </div>
+    </div>
     <canvas #canvas></canvas>
     <!-- <canvas #foreground></canvas> -->
     <div #console>

@@ -1,37 +1,3 @@
-//#region [> Tab and Section <]
-const tabs = $all(".tab");
-const sections = $all(".section");
-// let in_prest = false;
-
-const toggle_tabs = (keep=0)=>{
-    if (keep == 2) { in_prest = true; D.cash = D.cash; }
-    else in_prest = false;
-    for (let i = 0; i < tabs.length; i++) {
-        const e = tabs[i];
-        if (i != keep) e.classList.remove("in-sect");
-        else e.classList.add("in-sect");
-    }
-}
-const hide_sections = (keep=0)=>{
-    for (let i = 0; i < sections.length; i++) {
-        const e = sections[i];
-        if (i == keep) continue;
-        e.style.display = "none";
-    }
-}
-
-(()=>{
-    for (let i = 0; i < tabs.length; i++) {
-        const t = tabs[i];
-        t.onclick = function (){
-            sections[i].style.display = "grid";
-            toggle_tabs(i);
-            hide_sections(i);
-        }
-    }
-})(); tabs[0].onclick();
-//#endregion
-
 //#region [> Clicking Orbs <]
 
 const get_weight = (list)=>{
@@ -111,20 +77,21 @@ idle_btns[2].onclick = ()=>{
 //#region [> Prestige <]
 const prest_btns = $all("#prestige .btn");
 prest_btns[0].onclick = ()=>{
-    // if (D.cash < D.prest_cost) return;
+    if (D.cash < D.prest_cost) return;
 
     D.mana += calc_mana();
     D.prest_cost = Math.round(D.prest_cost * 1.25);
 
     for (const k in D.$init) {
         if (Object.hasOwnProperty.call(D.$init, k)) {
-            if (k == "prest_cost" || k == "mana" || k == "calc_mana") continue;
+            // if (k == "prest_cost" || k == "mana" || k == "calc_mana") continue;
             const v = D.$init[k];
             D[k] = v;
         }
     }
 
     entities.splice(0, entities.length);
+    cash_cache = 0;
     D.cash += D.prest_upgr_values[4];
     total_weight = 1;
     update_orb_btns();

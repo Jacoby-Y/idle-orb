@@ -1,3 +1,12 @@
+## v0.4
+- Changed theme to "dark"
+- Added new menu section and canvas moving system
+- Added working settings for drawing entities
+- Squashed bugs (with prestige mostly)
+- Styled it up
+- Had fun
+
+
 ## v0.3.2
 - Scaled graphics
 - Optimized trig

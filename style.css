@@ -3,14 +3,18 @@ body {
     height: 100vh;
     user-select: none;
     display: grid;
-    grid-template-columns: 1fr max-content;
+    grid-template-columns: 33.33vw 33.33vw 1fr;
     font-family: Arial, Helvetica, sans-serif;
-    overflow-y: hidden;
+    overflow: hidden;
+    background-color: #333;
 }
 
 #canvas {
     border-left: 2px solid black;
+    transform: translate(0, 0);
+    transition-duration: 0.5s;
 }
+#canvas:hover { transform: translate(-50%, 0); }
 #foreground {
     border-left: 2px solid black;
     position: absolute;
@@ -19,11 +23,17 @@ body {
     pointer-events: none;
 }
 
-main {
+#main1 {
     display: grid;
     grid-template-rows: max-content max-content 1fr;
+    border-right: 2px solid black;
+    margin-right: -2px;
     /* min-width: max-content; */
     /* width: min-content; */
+}
+#main2 {
+    display: grid;
+    grid-template-rows: max-content 1fr;
 }
 #cash-mana {
     display: grid;
@@ -34,8 +44,9 @@ main {
     font-size: 1.5rem;
     padding: 0.5rem 0.7rem;
     padding-bottom: 0;
+    color: white;
 }
-#sections {
+#main1 #sections {
     padding: 1rem;
     display: grid;
     grid-template-rows: max-content 1fr;
@@ -63,12 +74,12 @@ main {
     padding-bottom: 2px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    background-color: black;
+    background-color: #171717;
     color: white;
 }
-#tabs .in-sect {
-    background-color: white;
-    color: black;
+.in-sect {
+    background-color: #333;
+    color: white;
     transform: translateY(2px);
     border: 2px solid black;
     border-bottom: none;
@@ -95,7 +106,7 @@ main {
     grid-template-columns: 1fr max-content;
 }
 #upgr-idle .btn {
-    background-color: #aaa;
+    background-color: rgb(112, 233, 112);
     display: grid;
 }
 #upgr-orbs  .btn:hover, #upgr-idle  .btn:hover { opacity: 0.9; }
@@ -167,4 +178,46 @@ main {
 #console h3 {
     width: 100%;
     font-weight: normal;
+}
+
+#debug { padding: 0.5rem; }
+#debug h3 {
+    color: #d3d3d3;
+    padding: 0.5rem 0.7rem 0 0.7rem;
+}
+#settings {
+    padding: 1rem;
+}
+#settings .btn {
+    background-color: #aaa;
+    padding: 0.5rem 0.7rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+#settings .btn:hover {
+    background-color: #999;
+}
+
+#settings .btn-title:nth-of-type(1) { padding-top: 0; }
+#settings .btn-title {
+    text-align: center;
+    padding: 0.8rem;
+    color: white;
+    font-size: 1.3rem;
+}
+#settings .split-5 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    padding: 0;
+}
+#settings .split-5:hover { background-color: #aaa; }
+#settings .split-5 h3 {
+    font-size: 1rem;
+    text-align: center;
+    padding: 0.5rem 0.7rem;
+    min-width: max-content;
+}
+#settings .split-5 h3:nth-of-type(1) { background-color: #ccc; }
+#settings .split-5 h3:hover {
+    background-color: #999;
 }

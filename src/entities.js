@@ -1,23 +1,7 @@
-let run_main = true;
-const main_func = ()=>{
-    if (run_main == false && entities.length <= 0) return;
-    if (run_main == false && entities.length > 0) run_main = true;
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0,0, canvas.width, canvas.height);
-
-    update_entities();
-    run_update_functions();
-    // event_manager.step_jobs();
-    // run_mouse_listeners();
-
-    if (run_main == true && entities.length <= 0) run_main = false;
-}
-
 class Orb_Ent {
     constructor(index, drag=0.98, vect={x:1,y:1}, orb=new Orb(), cull=false) {
         this.cull = cull;
-        if (!cull) total_drawn++;
+        // if (!cull) total_drawn++;
         this.index = index;
         this.pos = {x:45,y:45};
         this.vect = vect;
@@ -38,9 +22,13 @@ class Orb_Ent {
     }
     update() {
         // if (!this.cull) draw_circ2(this.pos, 10, this.orb.color, true);
-        // if (!this.cull) draw.rect(this.pos.x-10, this.pos.y-10, 20, 20, { fill: true, fillStyle: this.orb.color });
-        if (!this.cull) draw_polygon(this.pos.x, this.pos.y, 10, 10, this.orb.color);
+        if (!this.cull && D.draw_setting == 0) draw_polygon(this.pos.x, this.pos.y, 7, 10, this.orb.color);
+        else if (!this.cull && D.draw_setting == 1) draw.rect(this.pos.x-10, this.pos.y-10, 20, 20, { fill: true, fillStyle: this.orb.color });
+        else if (!this.cull && D.draw_setting == 2) draw.rect(Math.floor((this.pos.x-10)/20)*20, Math.floor((this.pos.y-10)/20)*20, 20, 20, { fill: true, fillStyle: this.orb.color });
+        else if (!this.cull && D.draw_setting == 3) draw.rect(this.pos.x-10, this.pos.y-10, 3, 3, { fill: true, fillStyle: this.orb.color });
+        
 
+        //#region [> Collecter & Repulser <]
         const dist_rep = distance2(this.pos, repulse1);
         if (dist_rep <= repulse1.size+5) { // Hit repulser
             const velocity = distance(this.pos.x, this.pos.y, this.pos.x + this.vect.x, this.pos.y + this.vect.y);
@@ -71,26 +59,26 @@ class Orb_Ent {
         }
 
         const dist1 = (!this._destroy)? distance2(this.pos, collect1) : Infinity;
-        if (dist1 <= 50) {
-            add_cache(this.orb.value*this.orb.total);
+        if (dist1 <= 70) {
+            add_cache(this.orb.value*this.orb.weight);
             this._destroy = true;
         }
         const dist2 = (!this._destroy)? distance2(this.pos, collect2) : Infinity;
-        if (dist2 <= 50) {
-            add_cache(this.orb.value*this.orb.total*2);
+        if (dist2 <= 70) {
+            add_cache(this.orb.value*this.orb.weight*2);
             this._destroy = true;
         }
         const dist3 = (!this._destroy)? distance2(this.pos, collect3) : Infinity;
-        if (dist3 <= 50) {
-            add_cache(this.orb.value*this.orb.total*5);
+        if (dist3 <= 70) {
+            add_cache(this.orb.value*this.orb.weight*5);
             this._destroy = true;
         }
 
         if (this._destroy) {
             const res = perc_chance(D.prest_upgr_values[0]);
+            if (!this.cull) total_drawn--;
             for (let i = 0; i < res.over; i++) emit_orb();
             if (res.rand) emit_orb();
-            if (!this.cull) total_drawn--;
             return;
         } else {
             const pull1 = collecter_pull(this, collect1);
@@ -100,32 +88,32 @@ class Orb_Ent {
             this.vect.x += pull1.x + pull2.x + pull3.x; 
             this.vect.y += pull1.y + pull2.y + pull3.y;
         }
+        //#endregion
 
-
+        //#region [> Hit Wall <]
         const sx = this.pos.x;
         const sy = this.pos.y;
-        if (sx <= 0) {
+        if (sx <= 5) {
             this.vect.x *= (this.vect.x > 50)? -0.3 : -0.9;
-            this.pos.x = 1;
+            this.pos.x = 8;
         }
-        if (sy <= 0) {
+        if (sy <= 5) {
             this.vect.y *= (this.vect.y > 50)? -0.3 : -0.9;
-            this.pos.y = 1;
+            this.pos.y = 8;
         }
-        if (sx >= canvas.width) {
+        if (sx >= canvas.width-8) {
             this.vect.x *= (this.vect.x > 50)? -0.3 : -0.9;
-            this.pos.x = canvas.width-1;
+            this.pos.x = canvas.width-8;
         }
-        if (sy >= canvas.height) {
+        if (sy >= canvas.height-5) {
             this.vect.y *= (this.vect.y > 50)? -0.3 : -0.9;
-            this.pos.y = canvas.height-1;
+            this.pos.y = canvas.height-8;
         }
+        //#endregion
 
         this.vect.step(true, false);
     }
 }
-
-// entities.push(new Orb_Ent(entities.length, 1, {x:10, y:5}, D.orbs[0]));
 
 const entity_cap = 5000;
 const steps = 2;
@@ -153,9 +141,6 @@ const collect2 = { x: canvas.width-75, y: 75, G: 40000, color: "green" };
 const collect3 = { x: canvas.width-75, y: canvas.height-75, G: 30000, color: "gold" };
 
 const repulse1 = { x: canvas.width/2, y: canvas.height/2, size: Math.round(canvas.height/6)-5 };
-
-let clicked = false;
-let last_click = 0;
 
 const collecter_pull = (self, col)=>{
     const dist = distance2(self.pos, col); // hyp
@@ -185,16 +170,18 @@ const rand_orb = (list=[new Orb()])=>{
             if (rand <= total) return list[i];
         }
 }
+
 const perc_chance = (perc=0)=>{
     const over = Math.floor(perc/100);
     const mod = perc%100;
     const rand = Math.ceil(Math.random()*100);
     return {over: over, rand: (rand <= mod)};
 }
-const emit_orb = function(pass_cap=false) { // D.
+
+const emit_orb = function(pass_cap=false) {
     const orb = rand_orb(D.orbs);
     if (entities.length >= entity_cap && !pass_cap) {
-        add_cache(orb.value*orb.total);
+        add_cache(orb.value*orb.weight);
         return;
     }
 
@@ -204,8 +191,14 @@ const emit_orb = function(pass_cap=false) { // D.
     const ox = Math.cos(angle)*vel;
     const oy = Math.sin(angle)*vel;
 
-    entities.push(new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, do_cull()));
-}; $("#canvas").onclick = (e)=> {
+    const cull_draw = (total_drawn < max_drawn)? false : true;
+
+    if (!cull_draw) total_drawn++;
+
+    entities.push(new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, cull_draw));
+    // entities.push(new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, do_cull()));
+}; 
+$("#canvas").onclick = (e)=> {
     if (!clicked) clicked = true;
     const now = Date.now();
     if (now-last_click < 150) return;
@@ -236,144 +229,3 @@ const count_drawn = ()=>{
     return totalc;
 }
 
-const draw_simples = ()=>{
-    ctx.beginPath();
-    ctx.fillStyle = "black"; // Green fill
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, 30);
-    ctx.lineTo(10, 30);
-    ctx.lineTo(30, 50);
-
-    ctx.lineTo(30, 60);
-    ctx.lineTo(60, 30);
-
-    ctx.lineTo(50, 30);
-    ctx.lineTo(30, 10);
-    ctx.lineTo(30, 0);
-    ctx.closePath();
-    ctx.fill();
-
-
-    draw_circ2(collect1, 30, "grey", true);
-    draw_circ2(collect2, 30, "#008800", true);
-    draw_circ2(collect3, 30, "#bbbb00", true);
-
-    draw_circ2(repulse1, repulse1.size, "lime", true);
-    draw_circ2(repulse1, repulse1.size-5, "black", true);
-    
-    draw_text(collect1.x, collect1.y+8, `x1`, "30px arial", "black", "center");
-    draw_text(collect2.x, collect2.y+8, `x2`, "30px arial", "white", "center");
-    draw_text(collect3.x, collect3.y+8, `x5`, "30px arial", "black", "center");
-
-    // const ang = F_acos(100/-151)+ Math.PI;
-    // line_from_angle(repulse1, ang, 300, "aqua");
-
-
-    // line_from_angle({x: 100, y: 100}, Math.acos(4/5), 100, "aqua");
-
-
-    if (clicked) return;
-    draw_text(canvas.width/2-10, canvas.height/4-10, `Click Here!`, "30px arial", "black", "center");
-}; update.push(draw_simples);
-
-
-const idle_run = ()=>{
-    setTimeout(() => {
-        if (D.idle_orb_sec <= 0) return;
-        if (pause) { idle_run(); return; }
-        if (Math.random()*100 <= D.burst_fire_perc) for (let i = 0; i < D.burst_fire_amount; i++) emit_orb();
-        else emit_orb();
-        idle_run();
-    }, 1000/D.idle_orb_sec);
-}; if (D.idle_orb_sec > 0) idle_run();
-
-
-const cons = $("#console");
-const cons_input = $all("#console h3")[0];
-const cons_output = $all("#console h3")[1];
-
-let cons_open = false;
-let showing_out = false;
-
-let last_log = "";
-
-document.onkeydown = (e)=>{
-    const k = e.key;
-    // console.log(e);
-    if (k == "~") {
-        cons_open = !cons_open;
-        cons.style.display = (cons_open)? "block" : "none";
-        return;
-    }
-    if (cons_open) {
-        if (k == "ArrowUp") {
-            cons_input.innerText = `> ${last_log}`;
-            showing_out = false;
-        } else if (k == "ArrowDown") {
-            cons_input.innerText = "> ";
-        }
-        if (k == "Enter") {
-            last_log = cons_input.innerText.slice(1);
-            const ev = eval(last_log);
-            // if (typeof ev == "object") cons_output.innerText = `: ${JSON.Stringify(ev)}`;
-            if (
-                typeof ev === 'object' &&
-                !Array.isArray(ev) &&
-                ev !== null
-            ) { cons_output.innerText = `: ${JSON.stringify(ev)}`; }
-            else cons_output.innerText = `: ${ev}`;
-            cons_input.innerText = "> ";
-            showing_out = true;
-            return;
-        } if (k == "Backspace") {
-            if (cons_input.innerText.length <= 1) return;
-            cons_input.innerText = cons_input.innerText.slice(0, -1);
-            return;
-        }
-        if (k.length > 1) return;
-        if (showing_out) {
-            cons_input.innerText = "> ";
-            cons_output.innerText = ": ";
-            showing_out = false;
-        }
-        cons_input.innerText += (k == " ")? "\xa0" : k;
-        return;
-    }
-
-    if (k == " ") pause = !pause;
-    else if (k == "s") step = true;
-    else if (k == "1") tabs[0].onclick();
-    else if (k == "2") tabs[1].onclick();
-    else if (k == "3") tabs[2].onclick();
-    else if (k == "R") local.clear_storage();
-    else if (k == "l") loop_emit(max_drawn);
-    else if (k == ";") loop_emit(1000);
-    else if (k == "'") loop_emit(10000);
-}
-
-// D.frame = 0;
-let worst_frame = 0;
-let pause = false;
-let step = false;
-let m_secs = 1000;
-const main_loop = setInterval(() => {
-    const now = Date.now();
-    if (pause && !step) return;
-    if (step) step = false;
-    try {
-        main_func();
-    } catch (error) {
-        console.log(error);
-        pause=true;
-    }
-    worst_frame = Math.max(Date.now()-now, worst_frame);
-
-    if (m_secs >= 1000) {
-        add_cache(0, true);
-        m_secs = 0;
-    } else m_secs += 1000/60;
-}, 1000/50);
-
-setInterval(()=>{
-    D.ent_len = entities.length.toString() + " | " + worst_frame + " | " + ((pause)? "T" : "F");
-}, 250);
