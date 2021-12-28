@@ -9,6 +9,9 @@
     <script defer src="./src/upgrade.js"></script>
     <script defer src="./src/main_loop.js"></script>
     <script defer src="./src/main_sections.js"></script>
+    <script defer src="./src/achievements.js"></script>
+    
+    <script defer src="./src/wrap_up.js"></script>
 
     <link rel="stylesheet" href="./style.css">
     <title>Idle Orbs</title>
@@ -23,6 +26,7 @@
             <div .tab>Shop</div>
             <div .tab>Idle</div>
             <div .tab>Prestige</div>
+            <div .tab>Stats</div>
         </div>
         <div #sections>
             <div .section #upgr-orbs>
@@ -34,36 +38,43 @@
                 <div .btn></div>
             </div>
             <div .section #upgr-idle>
-                <div .btn><h3 :w>+1/sec: ${idle_orb_cost}</h3><h3 :w>({idle_orb_sec}/sec)</h3></div>
-                <div .btn><h3 :w>Burst fire +1%: ${burst_fire_perc_cost}</h3><h3 :w>({burst_fire_perc}%)</h3></div>
-                <div .btn><h3 :w>Burst fire amount +1: ${burst_fire_amount_cost}</h3><h3 :w>({burst_fire_amount})</h3></div>
+                <div .btn><h3 :w>+1/sec: ${idle_orb_cost}</h3><h3 :w>({idle_orb_sec}/sec)</h3>
+                <h3 .btn-tip>Spawns orbs automagically!</h3></div>
+                <div .btn><h3 :w>Burst fire +1%: ${burst_fire_perc_cost}</h3><h3 :w>({burst_fire_perc}%)</h3>
+                <h3 .btn-tip>Increases chance for idle to spawn a large burst of orbs, instead of just one</h3></div>
+                <div .btn><h3 :w>Burst fire amount +1: ${burst_fire_amount_cost}</h3><h3 :w>({burst_fire_amount})</h3>
+                <h3 .btn-tip>Increases the amount of orbs that spawn in the occasional burst fire</h3></div>
             </div>
             <div .section #prestige>
                 <div .btn>
-                    <h3 :w>{calc_mana, prest_cost => Mana +[0]: $[1] & start over}</h3>
+                    <h3 :w>Mana +{calc_mana}: ${F*prest_cost} & start over</h3>
                     <!-- <h3>Mana +<span :w>{calc_mana}</span>: $<span :w>{prest_cost}</span> & start over</h3> -->
-                    <h3 .tip>Gives a change to spawn another orb when one is collected</h3>
+                    <h3 .tip>Start over and get mana. Use mana to get special upgrades!</h3>
                 </div>
-                <div .btn|upgr><h3 :w>Recycle +1%: {prest_upgr_costs:0} mana</h3><h3 .info>?</h3>
+                <div .btn|upgr><h3 :w .btn-txt>Recycle +1%: {prest_upgr_costs.0} mana</h3>
                     <h3 .tip :w>Gives a chance to spawn another orb when one is collected<br>
-                    Current: {prest_upgr_values:0}%</h3>
+                    Current: {prest_upgr_values.0}%</h3>
                 </div>
-                <div .btn|upgr><h3 :w>Shotgun +1%: {prest_upgr_costs:1} mana</h3><h3 .info>?</h3>
+                <div .btn|upgr><h3 :w .btn-txt>Shotgun +1%: {prest_upgr_costs.1} mana</h3>
                     <h3 .tip :w>Gives a chance to spawn multiple orbs at once<br>
-                    Current: {prest_upgr_values:1}%</h3>
+                    Current: {prest_upgr_values.1}%</h3>
                 </div>
-                <div .btn|upgr><h3 :w>Shotgun Amount +1: {prest_upgr_costs:2} mana</h3><h3 .info>?</h3>
+                <div .btn|upgr><h3 :w .btn-txt>Shotgun Amount +1: {prest_upgr_costs.2} mana</h3>
                     <h3 .tip :w>Increases the amount of orbs spawned with shotgun shot<br>
-                    Current: {prest_upgr_values:2}</h3>
+                    Current: {prest_upgr_values.2}</h3>
                 </div>
-                <div .btn|upgr><h3 :w>Velocity +0.2%: {prest_upgr_costs:3} mana</h3><h3 .info>?</h3>
+                <div .btn|upgr><h3 :w .btn-txt>Velocity +0.2%: {prest_upgr_costs.3} mana</h3>
                     <h3 .tip :w>Increases the starting velocity of the orbs<br>
-                    Current: {prest_upgr_values:3}%</h3>
+                    Current: {prest_upgr_values.3}%</h3>
                 </div>
-                <div .btn|upgr><h3 :w>Magic Orb +1%: {prest_upgr_costs:4} mana</h3><h3 .info>?</h3>
+                <div .btn|upgr><h3 :w .btn-txt>Magic Orb +1%: {prest_upgr_costs.4} mana</h3>
                     <h3 .tip :w>Increase chance to spawn a "Magic Ball", which is worth 10% of your total cash<br>
-                    Current: {prest_upgr_values:4}%</h3>
+                    Current: {prest_upgr_values.4}%</h3>
                 </div>
+            </div>
+            <div .section #stats>
+                <h3 :w>Average cash/sec: {F*debug.3}</h3>
+                <h3 :w>Most cash/sec: {F*stats.most_made_per_second}</h3>
             </div>
         </div>
     </div>
@@ -71,13 +82,13 @@
         <div #tabs>
             <div .tab>Debug</div>
             <div .tab>Settings</div>
+            <div .tab>Achievements</div>
         </div>
         <div #sections>
             <div .section #debug>
-                <h3 :w>Paused: {debug:0}</h3>
-                <h3 :w>Total entities: {F+debug:1}</h3>
-                <h3 :w>Total drawn entities: {debug:2}</h3>
-                <h3 :w>Average cash/sec: {F+debug:3}</h3>
+                <h3 :w>Paused: {debug.0}</h3>
+                <h3 :w>Total entities: {F*debug.1}</h3>
+                <h3 :w>Total drawn entities: {debug.2}</h3>
             </div>
             <div .section #settings>
                 <h3 .btn-title>Render Mode</h3>
@@ -89,13 +100,23 @@
                     <h3>None</h3>
                 </div>
             </div>
+            <div .section #achievements>
+                <!-- <div .achieve> <div .mask></div>
+                    <h3 .txt></h3> <h3 .perc>0%</h3>
+                </div>
+                 -->
+            </div>
         </div>
     </div>
-    <canvas #canvas></canvas>
+    <div #canvas-wrapper><canvas #canvas></canvas></div>
     <!-- <canvas #foreground></canvas> -->
     <div #console>
         <h3>&gt; </h3>
         <h3>: </h3>
     </div>
+    <div .modal-wrapper> <div .modal #offline-modal>
+        <h2>Welcome back!</h2>
+        <h3>You made $<span #total></span> while offline</h3>
+    </div> </div>
 </body>
 </html>

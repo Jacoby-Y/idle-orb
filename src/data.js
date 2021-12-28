@@ -19,6 +19,7 @@ const calc_mana = ()=>{
 D.debug = [0, 0, 0, 0];
 
 D.$load = true;
+D.time_save = Math.round(Date.now()/1000);
 D.mana = 0;
 D.calc_mana = 0; 
 D.prest_cost = 100000; // 100k
@@ -67,7 +68,10 @@ D.burst_fire_perc = 0;
 D.burst_fire_perc_cost = 50;
 //#endregion
 
-window.onbeforeunload = ()=> local.store();
+window.onbeforeunload = ()=> {
+    D.time_save = Math.round(Date.now()/1000);
+    local.store();
+}
 
 
 // (function() {

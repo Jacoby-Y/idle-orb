@@ -5,9 +5,7 @@ Pages link: https://jacoby-y.github.io/idle-orb/
 
 
 ## Todo / Ideas
-- Prestige upgrade chance for ball's value to be % of total money
-- Replace starting cash with another upgrade
-- Acheivements? 
+- ...
 
 
 ## Optimization Stats (% spent)

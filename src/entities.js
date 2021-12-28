@@ -64,17 +64,17 @@ class Orb_Ent {
 
         const dist1 = (!this._destroy)? distance2(this.pos, collect1) : Infinity;
         if (dist1 <= 70) {
-            add_cache(this.orb.value*this.orb.weight);
+            add_cache((this.magic)? D.cash * 0.1 : this.orb.value*this.orb.weight);
             this._destroy = true;
         }
         const dist2 = (!this._destroy)? distance2(this.pos, collect2) : Infinity;
         if (dist2 <= 70) {
-            add_cache(this.orb.value*this.orb.weight*2);
+            add_cache((this.magic)? D.cash * 0.1 : this.orb.value*this.orb.weight*2);
             this._destroy = true;
         }
         const dist3 = (!this._destroy)? distance2(this.pos, collect3) : Infinity;
         if (dist3 <= 70) {
-            add_cache(this.orb.value*this.orb.weight*5);
+            add_cache((this.magic)? D.cash * 0.1 : this.orb.value*this.orb.weight*5);
             this._destroy = true;
         }
 
@@ -126,16 +126,22 @@ let cash_cache = 0;
 const add_cache = (num, flush=false)=>{
     if (flush) {
         D.cash += cash_cache;
+        stats.total_made += cash_cache;
+        stats.most_had = Math.max(D.stats.most_had, D.cash);
         cash_cache = 0;
         return;
     }
     if (entities.length < 200) {
         D.cash += num; 
+        stats.total_made += num;
+        stats.most_had = Math.max(D.stats.most_had, D.cash);
         return;
     }
     cash_cache += num;
     if (cash_cache > D.cash /10) {
         D.cash += cash_cache;
+        stats.total_made += cash_cache;
+        stats.most_had = Math.max(D.stats.most_had, D.cash);
         cash_cache = 0;
     }
 }
@@ -208,6 +214,7 @@ const emit_orb = function(pass_cap=false) {
     else new_orb.magic = false;
 
     entities.push(new_orb);
+    stats.most_entities = Math.max(D.stats.most_entities, entities.length);
     // entities.push(new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, do_cull()));
 }; 
 $("#canvas").onclick = (e)=> {
@@ -215,6 +222,7 @@ $("#canvas").onclick = (e)=> {
     const now = Date.now();
     if (now-last_click < 150) return;
     last_click = now;
+    stats.total_manual++;
 
     const res = perc_chance(D.prest_upgr_values[1]);
     if (res.over > 0) {

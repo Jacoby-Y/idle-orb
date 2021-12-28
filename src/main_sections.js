@@ -65,9 +65,10 @@ const hide_sections2 = (keep=0)=>{
             hide_sections2(i);
         }
     }
-})(); tabs2[0].onclick();
+})(); tabs2[2].onclick();
 //#endregion
 
+//#region [> Settings <]
 const draw_setting_btns = $all("#settings .split-5 h3");
 for (let i = 0; i < draw_setting_btns.length; i++) {
     const e = draw_setting_btns[i];
@@ -80,3 +81,4 @@ for (let i = 0; i < draw_setting_btns.length; i++) {
         this.style.backgroundColor = "#ccc";
     }
 }; draw_setting_btns[D.draw_setting].onclick();
+//#endregion

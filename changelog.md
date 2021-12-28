@@ -1,3 +1,11 @@
+## v0.5
+- Added stats
+- Added achievements 
+- CSS backend changes / organization
+- Fixed watcher.js backend
+- Added offline earnings modal
+
+
 # v0.4.1
 - Stylistic changes / cool things
 - Squashed web_mono_lib bugs

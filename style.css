@@ -3,7 +3,7 @@ body {
     height: 100vh;
     user-select: none;
     display: grid;
-    grid-template-columns: 33.33vw 33.33vw 1fr;
+    grid-template-columns: auto 1fr auto;
     font-family: Arial, Helvetica, sans-serif;
     overflow: hidden;
     background-color: #333;
@@ -11,10 +11,11 @@ body {
 
 #canvas {
     border-left: 2px solid black;
-    transform: translate(0, 0);
-    transition-duration: 0.5s;
+    position: absolute;
+    transform: translateX(0);
+    transition-duration: 300ms;
 }
-#canvas:hover { transform: translate(-50%, 0); }
+#canvas:hover { transform: translateX(-50%); }
 #foreground {
     border-left: 2px solid black;
     position: absolute;
@@ -99,18 +100,34 @@ body {
 
 #upgr-orbs .btn, #upgr-idle .btn {
     /* background-color: lightgrey; */
-    padding: 1rem;
+    padding: 1rem 1.2rem;
     margin-bottom: 1rem;
 
     display: none;
     grid-template-columns: 1fr max-content;
 }
 #upgr-idle .btn {
-    background-color: rgb(112, 233, 112);
+    background-color: #70e970;
     display: grid;
 }
 #upgr-orbs  .btn:hover, #upgr-idle  .btn:hover { opacity: 0.9; }
 #upgr-orbs .btn:active, #upgr-idle .btn:active { opacity: 0.8; }
+
+#upgr-idle .btn .btn-tip {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform: translateY(100%);
+
+    padding: 1rem 1.2rem;
+    background-color: #9bff9b;
+    width: calc(100% - 2rem - 7px);
+    transition-duration: 0.3s;
+}
+#upgr-idle .btn:hover > .btn-tip {
+    transform: translateY(0);
+}
+
 
 #prestige .two-piece {
     display: grid; 
@@ -121,7 +138,7 @@ body {
     padding: 1rem;
 }
 #prestige .btn {
-    position: relative;
+    /* position: relative; */
     padding: 0.5rem;
     background-color: #8ceeff;
     display: grid;
@@ -132,31 +149,27 @@ body {
 #prestige .btn .tip {
     position: absolute;
     background-color: #8ceeff;
-    width: calc(100% - 2rem);
+    width: calc(100% - 2rem - 1px);
     padding: 1rem;
     border-left: 1px solid white;
-    top: 0;
-    left: 100%;
+    bottom: 0;
+    left: 0;
     pointer-events: none;
-    opacity: 0;
     transition-duration: 0.3s;
-    font-weight: normal;
+    font-weight: bold;
+
+    transform: translateY(100%);
+}
+#prestige .btn:hover > .tip {
+    transform: translateY(0);
 }
 #prestige .btn h3 {
     padding: 0.5rem;
 }
-#prestige .btn .info {
-    padding: 0.5rem 0.8rem;
-    background-color: #b8ffff;
-    border-radius: 50%;
-    color: black;
-}
 #prestige .btn h3:first-child {
     min-width: max-content;
 }
-#prestige .btn .info:hover ~ .tip {
-    opacity: 1;
-}
+
 #prestige .btn:hover { background-color: #85ffff; }
 #prestige .btn:active { background-color: #afffff; }
 
@@ -178,6 +191,10 @@ body {
 #console h3 {
     width: 100%;
     font-weight: normal;
+}
+
+#stats h3 {
+    color: #efffc3;
 }
 
 #debug { padding: 0.5rem; }
@@ -220,4 +237,64 @@ body {
 #settings .split-5 h3:nth-of-type(1) { background-color: #ccc; }
 #settings .split-5 h3:hover {
     background-color: #999;
+}
+
+#achievements {
+    padding: 1rem;
+}
+.achieve {
+    padding: 1rem 1.2rem;
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    background-color: #ccc;
+    color: black;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+.achieve .txt {
+}
+.achieve .perc {
+
+}
+.achieve .mask {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    width: 0%;
+    background-color: #00b900;
+    clip-path: polygon(0% 0%, 0% 100%, 0 100%, 0 10%, 100% 10%, 100% 90%, 0 90%, 0 100%, 100% 100%, 100% 0%);
+}
+
+.modal-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000aa;
+
+    display: grid;
+    justify-items: center;
+    align-items: center;
+
+    display: none;
+}
+.modal-wrapper .modal {
+    background-color: ivory;
+}
+#offline-modal {
+    width: 30rem;
+    text-align: center;
+    padding: 4rem 1rem;
+    color: white;
+    background-color: #333;
+}
+#offline-modal h2 {
+    font-size: 2rem;
+    padding-bottom: 0.5rem;
+}
+#offline-modal h3 {
+    font-size: 1.5rem;
 }

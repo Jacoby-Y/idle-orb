@@ -74,6 +74,8 @@ idle_btns[2].onclick = ()=>{
 //#endregion
 
 //#region [> Prestige <]
+const prest_btn_txts = $all("#prestige .btn-txt");
+
 const prest_btns = $all("#prestige .btn");
 prest_btns[0].onclick = ()=>{
     if (D.cash < D.prest_cost) return;
@@ -96,7 +98,7 @@ prest_btns[0].onclick = ()=>{
 }
 
 const upgr_prest_thing = (i=0, incr=1, mult=1.2)=>{
-    if (D.mana < D.prest_upgr_costs[i]) return;
+    if (D.mana < D.prest_upgr_costs[i] || check_prest_max(i)) return;
     D.mana -= D.prest_upgr_costs[i];
     D.prest_upgr_costs[i] = Math.ceil(D.prest_upgr_costs[i] * mult);
     D.prest_upgr_values[i] += incr;
@@ -104,7 +106,33 @@ const upgr_prest_thing = (i=0, incr=1, mult=1.2)=>{
 
     D.prest_upgr_costs = D.prest_upgr_costs;
     D.prest_upgr_values = D.prest_upgr_values;
+
+    check_prest_max(i);
 }
+
+const check_prest_max = (i=-1)=>{
+    if (D.prest_upgr_values[0] >= 50) prest_btn_txts[0].innerText = "Recycle: Max of 50%";
+    if (D.prest_upgr_values[1] >= 75) prest_btn_txts[1].innerText = "Recycle: Max of 75%";
+    if (D.prest_upgr_values[3] >= 2) prest_btn_txts[3].innerText = "Recycle: Max of 2%";
+    if (D.prest_upgr_values[4] >= 25) prest_btn_txts[4].innerText = "Recycle: Max of 25%";
+
+    if (i == 0) { // Recycle
+        if (D.prest_upgr_values[0] >= 50) return true;
+        else return false;
+    }
+    if (i == 1) { // Shotgun %
+        if (D.prest_upgr_values[1] >= 75) return true; 
+        else return false;
+    }
+    if (i == 3) { // Velocity
+        if (D.prest_upgr_values[3] >= 2) return true; 
+        else return false;
+    }
+    if (i == 4) { // Magic Orb
+        if (D.prest_upgr_values[4] >= 50) return true; 
+        else return false;
+    }
+}; check_prest_max();
 
 prest_btns[1].onclick = ()=>{ // recycle
     upgr_prest_thing(0, 1, 1.25);
@@ -119,11 +147,11 @@ prest_btns[4].onclick = ()=>{ // velocity
     upgr_prest_thing(3, 0.2, 1.5);
 }
 prest_btns[5].onclick = ()=>{ // magic orb %
-    upgr_prest_thing(4, 10, 1.25);
+    upgr_prest_thing(4, 1, 1.5);
 }
 //#endregion
 
 
-D.$do_init = false; D.$load = false;
+D.$do_init = false; 
 
 // console.log(D.$init);

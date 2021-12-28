@@ -54,7 +54,7 @@ const draw_simples = ()=>{
 
 
     if (clicked) return;
-    draw_text(canvas.width/2-10, canvas.height/4-10, `Click Here!`, "30px arial", "white", "center");
+    draw_text(canvas.width/5, canvas.height/2+10, `Click Here!`, "30px arial", "white", "center");
 }; update.push(draw_simples);
 
 let clicked = false;
@@ -63,8 +63,8 @@ const idle_run = ()=>{
     setTimeout(() => {
         if (D.idle_orb_sec <= 0) return;
         if (pause) { idle_run(); return; }
-        if (Math.random()*100 <= D.burst_fire_perc) for (let i = 0; i < D.burst_fire_amount; i++) emit_orb();
-        else emit_orb();
+        if (Math.random()*100 <= D.burst_fire_perc) for (let i = 0; i < D.burst_fire_amount; i++) { emit_orb(); stats.total_idle++; }
+        else { emit_orb(); stats.total_idle++; }
         idle_run();
     }, 1000/D.idle_orb_sec);
 }; if (D.idle_orb_sec > 0) idle_run();
@@ -169,12 +169,15 @@ setInterval(()=>{
     D.debug[0] = pause.toString();
     D.debug[1] = entities.length.toString();
     total_drawn = count_drawn();
-    D.debug[2] = (D.draw_setting == 4)? 0 : total_drawn.toString();
+    D.debug[2] = (D.draw_setting == 4)? 0 : total_drawn;
     
     D.debug = D.debug;
     
     cash_list[loop_t] = Math.round((D.cash - cash_made)*10)/10;
     D.debug[3] = Math.round((average(cash_list))*10)/10;
+    stats.most_made_per_second = Math.max(D.stats.most_made_per_second, D.debug[3]);
+
+    D.stats = D.stats;
     cash_made = D.cash;
     if (loop_t >= 3) {
         
