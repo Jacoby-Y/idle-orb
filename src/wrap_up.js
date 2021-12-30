@@ -11,11 +11,12 @@ const calc_offline = (test=0)=>{
         total += (orb.value * (per_sec*offline))*(orb.weight/total_w);
     }; total = Math.round(total*10)/10;
 
+    if (total <= 0) return;
+
     D.cash += total;
 
     $(".modal-wrapper").style.display = "grid";
     if ($(".modal #total") != null) $(".modal #total").innerText = format_num(total);
-
     $(".modal-wrapper").onclick = ()=> $(".modal-wrapper").style.display = "none";
 
 }; calc_offline();

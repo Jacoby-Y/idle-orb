@@ -16,7 +16,6 @@ const main_func = ()=>{
     if (run_main == true && entities.length <= 0) run_main = false;
 }
 
-
 const draw_simples = ()=>{
     ctx.beginPath();
     ctx.fillStyle = "grey"; // Green fill

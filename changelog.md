@@ -1,3 +1,6 @@
+## v0.5.1
+- Small fixes
+
 ## v0.5
 - Added stats
 - Added achievements 
@@ -5,13 +8,11 @@
 - Fixed watcher.js backend
 - Added offline earnings modal
 
-
-# v0.4.1
+## v0.4.1
 - Stylistic changes / cool things
 - Squashed web_mono_lib bugs
 - Switched out prestige upgrade for "magic orbs"
 - Better cash per second text
-
 
 ## v0.4
 - Changed theme to "dark"
@@ -20,7 +21,6 @@
 - Squashed bugs (with prestige mostly)
 - Styled it up
 - Had fun
-
 
 ## v0.3.2
 - Scaled graphics
