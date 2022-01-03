@@ -1,3 +1,6 @@
+## v0.5.3 - Hot Fix
+- Added .gitignore
+
 ## v0.5.2 - Alpha 1
 - Refactored code into a more data oriented design
 - Balance changes
