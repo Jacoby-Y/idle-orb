@@ -131,7 +131,7 @@ const add_cache = (num, flush=false)=>{
         cash_cache = 0;
         return;
     }
-    if (entities.length < 200) {
+    if (orb_ents.length < 200) {
         D.cash += num; 
         stats.total_made += num;
         stats.most_had = Math.max(D.stats.most_had, D.cash);
@@ -152,14 +152,14 @@ const collect3 = { x: canvas.width-75, y: canvas.height-75, G: 30000, color: "go
 
 const repulse1 = { x: canvas.width/2, y: canvas.height/2, size: Math.round(canvas.height/6)-5 };
 
-const collecter_pull = (self, col)=>{
-    const dist = distance2(self.pos, col); // hyp
-    //const angle = get_angle(self.pos, col);
-    const dx = col.x - self.pos.x;
-    const dy = col.y - self.pos.y;
+const collecter_pull = (pos, col)=>{
+    const dist = distance2(pos, col); // hyp
+    //const angle = get_angle(pos, col);
+    const dx = col.x - pos.x;
+    const dy = col.y - pos.y;
     const check = F_acos(dx / dist);
     const angle = (dy < 0)? check*-1 : check;
-    //line_from_angle(self.pos, angle, 100, col.color);
+    //line_from_angle(pos, angle, 100, col.color);
     
     const vx = col.G*(Math.cos(angle)/(dist * dist));
     const vy = col.G*(Math.sin(angle)/(dist * dist));
@@ -191,7 +191,7 @@ const perc_chance = (perc=0)=>{
 
 const emit_orb = function(pass_cap=false) {
     const orb = rand_orb(D.orbs);
-    if (entities.length >= entity_cap && !pass_cap) {
+    if (orb_ents.length >= entity_cap && !pass_cap) {
         add_cache(orb.value*orb.weight);
         return;
     }
@@ -206,16 +206,18 @@ const emit_orb = function(pass_cap=false) {
 
     if (!cull_draw) total_drawn++;
     const is_magic = perc_chance(D.prest_upgr_values[4]).min_one;
-    const new_orb = new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, cull_draw);
-    if (is_magic) { 
-        new_orb.magic = true;
-        new_orb.orb.color = "#ff0000";
-    }
-    else new_orb.magic = false;
+    // const new_orb = new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, cull_draw);
+    // if (is_magic) { 
+    //     new_orb.magic = true;
+    //     new_orb.orb.color = "#ff0000";
+    // }
+    // else new_orb.magic = false;
 
-    entities.push(new_orb);
-    stats.most_entities = Math.max(D.stats.most_entities, entities.length);
-    // entities.push(new Orb_Ent(entities.length, 0.98, {x: ox, y: oy}, orb, do_cull()));
+    // entities.push(new_orb);
+    // stats.most_entities = Math.max(D.stats.most_entities, entities.length);
+    stats.most_entities = Math.max(D.stats.most_entities, orb_ents.length);
+
+    orb_ents.new(cull_draw, {x: ox, y: oy}, orb, is_magic);
 }; 
 $("#canvas").onclick = (e)=> {
     if (!clicked) clicked = true;
@@ -242,10 +244,9 @@ const loop_emit = (amount)=>{
 
 const count_drawn = ()=>{ 
     let totalc = 0;
-     for (let i = 0; i < entities.length; i++) {
-         const cull = entities[i].cull;
+     for (let i = 0; i < orb_ents.cull.length; i++) {
+         const cull = orb_ents.cull[i];
          if (cull == false) totalc++;
     }
     return totalc;
 }
-

@@ -1,3 +1,7 @@
+## v0.5.2 - Alpha 1
+- Refactored code into a more data oriented design
+- Balance changes
+
 ## v0.5.1
 - Small fixes
 

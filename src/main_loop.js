@@ -1,7 +1,7 @@
 let run_main = true;
 const main_func = ()=>{
-    if (run_main == false && entities.length <= 0) return;
-    if (run_main == false && entities.length > 0) run_main = true;
+    if (run_main == false && orb_ents.length <= 0) return;
+    if (run_main == false && orb_ents.length > 0) run_main = true;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     // ctx.clearRect(0,0, canvas.width, canvas.height);
@@ -13,7 +13,7 @@ const main_func = ()=>{
     // event_manager.step_jobs();
     // run_mouse_listeners();
 
-    if (run_main == true && entities.length <= 0) run_main = false;
+    if (run_main == true && orb_ents.length <= 0) run_main = false;
 }
 
 const draw_simples = ()=>{
@@ -80,6 +80,10 @@ let last_log = "";
 
 document.onkeydown = (e)=>{
     const k = e.key;
+    if (k == " ") pause = !pause;
+
+    if (window.location.hostname != "127.0.0.1") return;
+
     // console.log(e);
     if (k == "~") {
         cons_open = !cons_open;
@@ -121,8 +125,8 @@ document.onkeydown = (e)=>{
         return;
     }
 
-    if (k == " ") pause = !pause;
-    else if (k == "s") step = true;
+    
+    if (k == "s") step = true;
     else if (k == "1") tabs1[0].onclick();
     else if (k == "2") tabs1[1].onclick();
     else if (k == "3") tabs1[2].onclick();
@@ -164,9 +168,9 @@ let cash_list = [0, 0, 0, 0];
 let loop_t = 0;
 setInterval(()=>{
 
-    D.ent_len = entities.length.toString() + " | " + worst_frame + " | " + ((pause)? "T" : "F");
+    D.ent_len = orb_ents.length.toString() + " | " + worst_frame + " | " + ((pause)? "T" : "F");
     D.debug[0] = pause.toString();
-    D.debug[1] = entities.length.toString();
+    D.debug[1] = orb_ents.length.toString();
     total_drawn = count_drawn();
     D.debug[2] = (D.draw_setting == 4)? 0 : total_drawn;
     
@@ -175,6 +179,8 @@ setInterval(()=>{
     cash_list[loop_t] = Math.round((D.cash - cash_made)*10)/10;
     D.debug[3] = Math.round((average(cash_list))*10)/10;
     stats.most_made_per_second = Math.max(D.stats.most_made_per_second, D.debug[3]);
+
+    calc_mana();
 
     D.stats = D.stats;
     cash_made = D.cash;

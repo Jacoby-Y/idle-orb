@@ -14,7 +14,7 @@ let total_weight = get_weight(D.orbs);
 
 const orb_btns = $all("#upgr-orbs .btn");
 //Math.round(orb.weight/total_weight*1000)/10
-const orb_html = (e, orb)=> e.innerHTML = `<h3>Value +${orb.per_upgr}: $${format_num(orb.up_cost)}</h3><h3>${calc_weight(orb.weight)}% | (${format_num(orb.value*orb.weight)}) </h3>`;
+const orb_html = (e, orb=new Orb())=> e.innerHTML = `<h3>Value +${format_num(orb.value)}: $${format_num(orb.up_cost)}</h3><h3>${calc_weight(orb.weight)}% | (${format_num(orb.value*orb.weight)}) </h3>`;
 
 const update_orb_btns = ()=>{
     for (let i = 0; i < orb_btns.length; i++) {
@@ -91,7 +91,9 @@ prest_btns[0].onclick = ()=>{
         }
     }
 
-    entities.splice(0, entities.length);
+    // entities.splice(0, entities.length);
+    for (let i = 0; i < orb_ents.destroy.length; i++) orb_ents.destroy[i] = true;
+    orb_ents.clear();
     cash_cache = 0;
     total_weight = 1;
     update_orb_btns();
