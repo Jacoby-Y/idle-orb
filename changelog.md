@@ -1,3 +1,7 @@
+## v0.5.4
+- Removed magic orb
+- Added versioning system
+
 ## v0.5.3 - Hot Fix
 - Added .gitignore
 

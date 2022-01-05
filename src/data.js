@@ -10,6 +10,11 @@ D.settings = {
     burst_fire_perc_cost: {display(v){ return format_num(v, 1)}, round: 1},
 };
 
+const VERSION = "0.5.4";
+if (local.get_storage().version != VERSION) {
+    console.log("Loading new version!");
+    window.localStorage.clear();
+}
 
 const calc_mana = ()=>{
     D.calc_mana = Math.round(D.cash / 5000);
@@ -33,7 +38,7 @@ D.$do_init = true;
 D.cash = 0;
 
 D.ent_len = 0;
-
+D.version = VERSION;
 
 //#region [> Orb Stuff <]
 //* Clicking

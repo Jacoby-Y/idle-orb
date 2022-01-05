@@ -148,9 +148,6 @@ prest_btns[3].onclick = ()=>{ // shotgun #
 prest_btns[4].onclick = ()=>{ // velocity
     upgr_prest_thing(3, 0.2, 1.5);
 }
-prest_btns[5].onclick = ()=>{ // magic orb %
-    upgr_prest_thing(4, 1, 1.5);
-}
 //#endregion
 
 
