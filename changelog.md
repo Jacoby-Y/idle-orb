@@ -1,3 +1,6 @@
+## v0.5.5 - Hot Fix
+- Added way to restart
+
 ## v0.5.4
 - Removed magic orb
 - Added versioning system

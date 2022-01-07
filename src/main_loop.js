@@ -81,7 +81,10 @@ let last_log = "";
 document.onkeydown = (e)=>{
     const k = e.key;
     if (k == " ") pause = !pause;
-
+    else if (k == "R" && !cons_open) { 
+        const confirm = window.confirm("Typing in shift+R causes you to restart your progress. Would you like to restart?")
+        if (confirm) local.clear_storage();
+    }
     if (window.location.hostname != "127.0.0.1") return;
 
     // console.log(e);
@@ -130,7 +133,7 @@ document.onkeydown = (e)=>{
     else if (k == "1") tabs1[0].onclick();
     else if (k == "2") tabs1[1].onclick();
     else if (k == "3") tabs1[2].onclick();
-    else if (k == "R") local.clear_storage();
+    // else if (k == "R") local.clear_storage();
     else if (k == "l") loop_emit(max_drawn);
     else if (k == ";") loop_emit(1000);
     else if (k == "'") loop_emit(10000);
